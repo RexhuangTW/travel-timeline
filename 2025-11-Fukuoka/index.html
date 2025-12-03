@@ -5,86 +5,87 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>福岡採買放風之旅 🍜</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: { sans: ['"Inter"', '"Noto Sans TC"', 'sans-serif'], mono: ['"Inter"', 'monospace'] },
-                    animation: { 'slide-up': 'slideUp 0.5s ease-out forwards', 'float': 'float 3s ease-in-out infinite' },
+                    fontFamily: { sans: ['"Plus Jakarta Sans"', '"Noto Sans TC"', 'sans-serif'], mono: ['"Plus Jakarta Sans"', 'monospace'] },
+                    animation: { 'fade-in': 'fadeIn 0.6s ease-out forwards', 'float': 'float 4s ease-in-out infinite' },
                     keyframes: {
-                        slideUp: { '0%': { opacity: '0', transform: 'translateY(20px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
-                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-6px)' } }
+                        fadeIn: { '0%': { opacity: '0', transform: 'translateY(10px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-5px)' } }
                     }
                 }
             }
         }
     </script>
     <style>
-        body { background-color: #fff7ed; -webkit-tap-highlight-color: transparent; scroll-behavior: smooth; }
+        body { background-color: #fafafa; -webkit-tap-highlight-color: transparent; scroll-behavior: smooth; }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .glass-header { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.6); }
-        .dashboard-card { background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.4); box-shadow: 0 8px 32px 0 rgba(135, 38, 38, 0.1); }
-        .timeline-line { position: absolute; left: 27px; top: 20px; bottom: 0; width: 2px; background: linear-gradient(to bottom, #fdba74 50%, rgba(255,255,255,0) 100%); z-index: 0; }
         
-        .nav-bar {
-            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px);
-            border-radius: 9999px; padding: 0.35rem; display: flex; gap: 0.25rem;
-            z-index: 100; box-shadow: 0 10px 30px -5px rgba(0,0,0,0.15);
-            border: 1px solid rgba(0,0,0,0.05);
+        /* 高級毛玻璃 */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
         }
-        .nav-btn {
-            padding: 0.6rem 1.5rem; border-radius: 9999px; color: #64748b; font-size: 0.9rem; font-weight: 700;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; items-center; gap: 0.4rem;
-        }
-        .nav-btn.active { background: #ea580c; color: white; box-shadow: 0 4px 12px -2px rgba(234, 88, 12, 0.4); }
 
+        /* 瀑布流佈局 */
+        .masonry-grid { column-count: 2; column-gap: 1rem; }
+        .masonry-item { break-inside: avoid; margin-bottom: 1rem; }
+
+        /* 漸層按鈕 */
+        .btn-gradient {
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            box-shadow: 0 4px 12px rgba(234, 88, 12, 0.3);
+        }
+        
+        /* IG 按鈕 */
         .btn-instagram {
             background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-            color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            color: white; box-shadow: 0 4px 10px rgba(220, 39, 67, 0.2);
         }
-        .btn-instagram:hover { filter: brightness(1.1); transform: translateY(-1px); }
     </style>
 </head>
-<body class="text-slate-800 antialiased pb-32">
+<body class="text-slate-800 antialiased pb-36">
 
-    <div class="relative bg-gradient-to-br from-red-500 via-orange-500 to-yellow-500 text-white pb-8 pt-12 px-6 rounded-b-[3rem] shadow-2xl overflow-hidden">
-        <div class="absolute top-10 right-10 text-6xl opacity-20 animate-float">🍜</div>
-        <div class="absolute bottom-10 left-0 text-8xl opacity-10 animate-float" style="animation-delay: 1.5s;">⛩️</div>
-        
-        <a href="../" class="absolute top-6 left-6 p-2.5 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-full transition-all z-20 shadow-sm border border-white/20">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+    <div class="relative bg-white pb-6 pt-14 px-6 rounded-b-[2.5rem] shadow-sm z-10 overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-orange-50 via-white to-red-50 opacity-80"></div>
+        <div class="absolute -top-20 -right-20 w-64 h-64 bg-orange-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float"></div>
+        <div class="absolute top-20 -left-20 w-64 h-64 bg-red-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float" style="animation-delay: 2s"></div>
+
+        <a href="../" class="absolute top-6 left-6 w-10 h-10 flex items-center justify-center bg-white/80 backdrop-blur rounded-full shadow-sm border border-gray-100 z-20 text-slate-600 hover:scale-105 transition-transform">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
         </a>
 
-        <div class="relative z-10 max-w-lg mx-auto">
-            <div class="text-center mt-2 mb-6">
-                <span class="inline-flex items-center gap-1.5 py-1 px-3 rounded-full bg-black/20 backdrop-blur-md text-[10px] font-bold tracking-widest uppercase border border-white/20 shadow-sm">
-                    <span class="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse"></span> Fukuoka 2025
-                </span>
-                <h1 class="text-3xl font-black tracking-tight mt-3 mb-1 drop-shadow-lg">福岡採買放風之旅</h1>
-                <div id="countdown-timer" class="text-orange-50 text-sm font-medium opacity-90 mt-2 font-mono bg-white/10 inline-block px-3 py-1 rounded-lg backdrop-blur-sm border border-white/10">計算中...</div>
+        <div class="relative z-10 max-w-lg mx-auto text-center">
+            <div class="inline-flex items-center gap-1.5 py-1 px-3 rounded-full bg-orange-100/50 border border-orange-200/50 text-[10px] font-bold tracking-widest uppercase text-orange-700 mb-4">
+                Fukuoka 2025
             </div>
+            <h1 class="text-4xl font-black tracking-tight text-slate-900 mb-2 leading-tight">
+                福岡<br><span class="text-orange-600">採買放風</span>之旅
+            </h1>
+            <div id="countdown-timer" class="text-slate-400 text-xs font-medium font-mono tracking-wide mb-6">計算中...</div>
 
             <div class="grid grid-cols-2 gap-3">
-                <div class="dashboard-card rounded-2xl p-4 flex flex-col justify-between h-[100px] relative overflow-hidden group">
-                    <div class="absolute -right-4 -top-4 text-6xl opacity-20 rotate-12 group-hover:scale-110 transition-transform">💰</div>
-                    <div>
-                        <p class="text-[10px] text-orange-100 font-bold uppercase tracking-wider mb-1">Total Cost</p>
-                        <div class="flex items-baseline gap-1">
-                            <span class="text-sm font-light opacity-80">$</span>
-                            <span id="total-budget" class="text-2xl font-bold font-mono tracking-tighter text-orange-50">0</span>
-                        </div>
+                <div class="bg-white/60 backdrop-blur p-4 rounded-2xl border border-white shadow-sm flex flex-col justify-center items-start">
+                    <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Estimated Cost</span>
+                    <div class="flex items-baseline gap-1">
+                        <span class="text-xs text-orange-500 font-bold">$</span>
+                        <span id="total-budget" class="text-2xl font-black text-slate-800 tracking-tight">0</span>
                     </div>
                 </div>
-                <div class="dashboard-card rounded-2xl overflow-hidden h-[100px] relative flex flex-col items-center justify-center group">
-                    <span class="absolute top-2 left-3 text-[10px] text-orange-100 font-bold uppercase tracking-wider z-10 opacity-70">Fukuoka Now</span>
-                    <div id="weather-display" class="flex items-center justify-center gap-3 mt-2 transition-all duration-500 opacity-0">
-                        <span id="weather-icon" class="text-4xl filter drop-shadow-sm animate-float">☀️</span>
-                        <div class="text-left">
-                            <div id="weather-temp" class="text-3xl font-black text-orange-50 tracking-tighter leading-none">--°</div>
-                            <div id="weather-desc" class="text-[10px] font-bold text-orange-100 uppercase tracking-wide">Loading</div>
+                <div class="bg-gradient-to-br from-blue-500 to-blue-600 p-4 rounded-2xl shadow-lg shadow-blue-200 text-white flex flex-col justify-center items-center relative overflow-hidden group">
+                    <span class="absolute top-2 left-3 text-[9px] font-bold opacity-60 uppercase tracking-widest">Fukuoka</span>
+                    <div id="weather-loading" class="absolute inset-0 flex items-center justify-center bg-blue-500"><div class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div></div>
+                    <div id="weather-display" class="flex flex-col items-center opacity-0 transition-opacity duration-500">
+                        <span id="weather-icon" class="text-3xl mb-1 filter drop-shadow-md">☀️</span>
+                        <div class="flex items-baseline">
+                            <span id="weather-temp" class="text-2xl font-bold">--</span>
+                            <span class="text-sm opacity-80 font-light">°C</span>
                         </div>
                     </div>
                 </div>
@@ -92,28 +93,36 @@
         </div>
     </div>
 
-    <div class="max-w-xl mx-auto -mt-6 relative z-20 px-4">
-        <div id="sticky-header" class="sticky top-4 z-40 mb-6 transition-all duration-300">
-            <div class="glass-header shadow-lg rounded-2xl p-1.5 bg-white/80">
-                <div class="flex overflow-x-auto hide-scrollbar gap-1.5" id="day-tabs"></div>
-                <div class="flex overflow-x-auto hide-scrollbar gap-1.5 hidden" id="category-tabs"></div>
+    <div class="max-w-xl mx-auto px-4 relative z-20 -mt-2">
+        
+        <div id="sticky-header" class="sticky top-4 z-30 mb-6 transition-all duration-300">
+            <div class="glass-panel rounded-2xl p-1.5 shadow-sm">
+                <div class="flex overflow-x-auto hide-scrollbar gap-1" id="day-tabs"></div>
+                <div class="flex overflow-x-auto hide-scrollbar gap-1 hidden" id="category-tabs"></div>
             </div>
         </div>
 
         <div class="relative min-h-[400px]">
-            <div id="timeline-line" class="timeline-line transition-opacity duration-300"></div>
-            <div id="schedule-list" class="space-y-4 relative z-10 pb-10">
+            <div id="timeline-line" class="absolute left-[27px] top-4 bottom-0 w-[2px] bg-gray-100 z-0"></div>
+            
+            <div id="schedule-list" class="relative z-10">
                  <div class="flex flex-col items-center justify-center py-20 text-gray-400">
-                    <div class="w-10 h-10 border-4 border-orange-200 border-t-orange-500 rounded-full animate-spin mb-4"></div>
-                    <p class="text-sm">正在載入...</p>
+                    <div class="w-8 h-8 border-2 border-orange-100 border-t-orange-500 rounded-full animate-spin mb-3"></div>
+                    <p class="text-xs">Loading...</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="nav-bar">
-        <button onclick="switchMode('schedule')" id="btn-schedule" class="nav-btn active">📅 行程表</button>
-        <button onclick="switchMode('list')" id="btn-list" class="nav-btn">📝 備忘錄</button>
+    <div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
+        <div class="glass-panel rounded-full p-1.5 flex gap-1 shadow-xl shadow-orange-100/50">
+            <button onclick="switchMode('schedule')" id="btn-schedule" class="px-5 py-2.5 rounded-full text-xs font-bold transition-all flex items-center gap-2 bg-slate-800 text-white shadow-md">
+                <span>📅</span> 行程
+            </button>
+            <button onclick="switchMode('list')" id="btn-list" class="px-5 py-2.5 rounded-full text-xs font-bold text-slate-500 hover:bg-white transition-all flex items-center gap-2">
+                <span>📝</span> 清單
+            </button>
+        </div>
     </div>
 
     <script>
@@ -121,24 +130,24 @@
 
         let currentMode = 'schedule';
         let currentDayIndex = 0;
-        let rawData = [];
-        let scheduleData = [];
-        let listData = new Map();
+        let scheduleData = [], listData = new Map();
 
         window.onload = function() { fetchData(); initWeather(); };
 
         function initWeather() {
-            const apiUrl = "https://api.open-meteo.com/v1/forecast?latitude=33.59&longitude=130.40&current=temperature_2m,weather_code&timezone=Asia%2FTokyo";
-            fetch(apiUrl).then(res => res.json()).then(data => {
+            // 福岡座標
+            fetch("https://api.open-meteo.com/v1/forecast?latitude=33.59&longitude=130.40&current=temperature_2m,weather_code&timezone=Asia%2FTokyo")
+            .then(res => res.json()).then(data => {
                 const code = data.current.weather_code;
                 const temp = Math.round(data.current.temperature_2m);
-                let icon = "☁️", desc = "Cloudy";
-                if (code === 0) { icon = "☀️"; desc = "Sunny"; }
-                else if (code >= 1 && code <= 3) { icon = "⛅"; desc = "Cloudy"; }
-                else if (code >= 51 && code <= 67) { icon = "🌧️"; desc = "Rain"; }
-                document.getElementById('weather-temp').innerText = `${temp}°`;
+                let icon = "☁️";
+                if (code === 0) icon = "☀️";
+                else if (code >= 1 && code <= 3) icon = "⛅";
+                else if (code >= 51) icon = "🌧️";
+                
+                document.getElementById('weather-temp').innerText = temp;
                 document.getElementById('weather-icon').innerText = icon;
-                document.getElementById('weather-desc').innerText = desc;
+                document.getElementById('weather-loading').style.display = 'none';
                 document.getElementById('weather-display').classList.remove('opacity-0');
             }).catch(console.error);
         }
@@ -151,26 +160,22 @@
         }
 
         function processData(data) {
-            rawData = data.filter(row => row.day_group);
-            if (!rawData.length) return;
+            const raw = data.filter(row => row.day_group);
+            if (!raw.length) return;
 
             let grandTotal = 0;
             const scheduleMap = new Map();
 
-            rawData.forEach(row => {
+            raw.forEach(row => {
                 let cost = parseInt((row.cost||"").replace(/[^0-9]/g, '')) || 0; 
                 grandTotal += cost;
                 
                 let mapUrl = row.map_url || (row.title ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(row.title)}` : "");
                 
-                // 【修正處】自動 IG 連結邏輯 (加入正確的反引號)
+                // 自動 IG 連結
                 let igUrl = row.instagram || "";
-                // 讀取 type 並轉小寫，如果沒有 type 則給空字串，防止報錯
-                const typeLower = (row.type || "").toLowerCase();
-
-                if (!igUrl && row.title && !typeLower.includes('transport')) {
+                if (!igUrl && row.title && !(row.type||"").toLowerCase().includes('transport')) {
                     const cleanTitle = row.title.replace(/[ .\/\\()（）-]/g, '');
-                    // 這裡修復了語法錯誤
                     igUrl = `https://www.instagram.com/explore/tags/${encodeURIComponent(cleanTitle)}/`;
                 }
 
@@ -199,50 +204,95 @@
 
         function switchMode(mode) {
             currentMode = mode;
-            document.getElementById('btn-schedule').className = `nav-btn ${mode === 'schedule' ? 'active' : ''}`;
-            document.getElementById('btn-list').className = `nav-btn ${mode === 'list' ? 'active' : ''}`;
-            
-            const dayTabs = document.getElementById('day-tabs');
-            const catTabs = document.getElementById('category-tabs');
+            const btnSchedule = document.getElementById('btn-schedule');
+            const btnList = document.getElementById('btn-list');
+            const activeClass = "bg-slate-800 text-white shadow-md";
+            const inactiveClass = "text-slate-500 hover:bg-white";
 
             if (mode === 'schedule') {
+                btnSchedule.className = `px-5 py-2.5 rounded-full text-xs font-bold transition-all flex items-center gap-2 ${activeClass}`;
+                btnList.className = `px-5 py-2.5 rounded-full text-xs font-bold transition-all flex items-center gap-2 ${inactiveClass}`;
+                document.getElementById('tabs-container')?.classList.remove('hidden'); // Logic updated
                 document.getElementById('timeline-line').style.opacity = '1';
-                dayTabs.classList.remove('hidden');
-                catTabs.classList.add('hidden');
+                document.getElementById('day-tabs').classList.remove('hidden');
+                document.getElementById('category-tabs').classList.add('hidden');
                 renderScheduleMode();
             } else {
+                btnList.className = `px-5 py-2.5 rounded-full text-xs font-bold transition-all flex items-center gap-2 ${activeClass}`;
+                btnSchedule.className = `px-5 py-2.5 rounded-full text-xs font-bold transition-all flex items-center gap-2 ${inactiveClass}`;
                 document.getElementById('timeline-line').style.opacity = '0';
-                dayTabs.classList.add('hidden');
-                catTabs.classList.remove('hidden');
+                document.getElementById('day-tabs').classList.add('hidden');
+                document.getElementById('category-tabs').classList.remove('hidden');
                 renderListMode();
             }
         }
 
+        // ==================== 1. 行程模式 (Schedule) ====================
         function renderScheduleMode() {
             renderTabs();
-            if(scheduleData.length > 0) renderEvents(scheduleData[currentDayIndex].events);
-            else document.getElementById('schedule-list').innerHTML = `<div class="text-center py-10 text-gray-400">目前沒有固定行程</div>`;
+            const container = document.getElementById('schedule-list');
+            container.innerHTML = '';
+            container.className = "space-y-6 pb-24"; // 恢復一般列表間距
+
+            if(scheduleData.length > 0) {
+                scheduleData[currentDayIndex].events.forEach((e, i) => {
+                    const item = document.createElement('div');
+                    item.className = "flex gap-4 items-stretch group opacity-0 animate-fade-in";
+                    item.style.animationDelay = `${i * 50}ms`;
+
+                    let imgHtml = e.image ? `<div class="mt-3 rounded-xl overflow-hidden h-36 w-full shadow-sm"><img src="${e.image}" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"></div>` : '';
+                    let igBtn = e.igUrl ? `<button onclick="event.stopPropagation(); window.open('${e.igUrl}', '_blank')" class="ml-auto btn-instagram text-[10px] px-2.5 py-1 rounded-full font-bold flex items-center gap-1 transition-transform hover:scale-105"><span>📷</span> Reels</button>` : '';
+                    let costHtml = e.cost > 0 ? `<span class="text-[10px] font-bold text-slate-400">NT$${e.cost.toLocaleString()}</span>` : '';
+
+                    item.innerHTML = `
+                        <div class="flex-none w-[56px] flex flex-col items-center relative z-10">
+                            <div class="sticky top-24 flex flex-col items-center">
+                                <span class="text-[10px] font-bold text-slate-400 mb-1.5 font-mono">${e.time.split(' ')[0]}</span>
+                                <div class="w-10 h-10 rounded-full bg-white border border-gray-100 shadow-sm flex items-center justify-center text-lg z-10 group-hover:scale-110 group-hover:border-orange-200 transition-all duration-300">
+                                    ${e.icon}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex-1 bg-white rounded-2xl p-4 border border-gray-100/50 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.03)] hover:shadow-lg hover:border-orange-100 transition-all cursor-pointer relative overflow-hidden" onclick="window.open('${e.mapUrl}', '_blank')">
+                            <div class="flex justify-between items-start mb-1">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold ${e.type.bg} ${e.type.text}">${e.type.label}</span>
+                                ${costHtml}
+                            </div>
+                            <h3 class="font-bold text-slate-800 text-[17px] mb-1 leading-snug group-hover:text-orange-600 transition-colors">${e.title}</h3>
+                            <p class="text-slate-500 text-xs leading-relaxed line-clamp-2">${e.desc}</p>
+                            ${imgHtml}
+                            <div class="mt-3 flex items-center justify-end">${igBtn}</div>
+                        </div>
+                    `;
+                    container.appendChild(item);
+                });
+            } else {
+                container.innerHTML = `<div class="text-center py-10 text-gray-400 text-sm">尚無行程</div>`;
+            }
         }
 
+        // ==================== 2. 清單模式 (List - Masonry) ====================
         function renderListMode() {
             const container = document.getElementById('schedule-list');
             const catContainer = document.getElementById('category-tabs');
             container.innerHTML = '';
             catContainer.innerHTML = ''; 
-            
+            container.className = "pb-24"; // 移除 space-y，改用內部 margin
+
             if (listData.size === 0) {
-                container.innerHTML = `<div class="text-center py-10 text-gray-400">Google Sheet 中沒有「無日期」的清單項目</div>`;
+                container.innerHTML = `<div class="text-center py-10 text-gray-400">無清單資料</div>`;
                 return;
             }
 
+            // 頂部類別導航
             listData.forEach((_, category) => {
                 const btn = document.createElement('button');
-                btn.className = "flex-none px-4 py-2 rounded-full text-xs font-bold bg-white text-gray-600 border border-gray-200 hover:bg-orange-50 hover:text-orange-600 hover:border-orange-200 transition-colors shadow-sm";
+                btn.className = "flex-none px-4 py-2 rounded-full text-xs font-bold bg-white text-gray-500 border border-gray-200 hover:bg-orange-50 hover:text-orange-600 hover:border-orange-200 transition-all";
                 btn.innerText = category;
                 btn.onclick = () => {
                     const section = document.getElementById(`cat-${category}`);
                     if(section) {
-                        const yOffset = -140; 
+                        const yOffset = -120; 
                         const y = section.getBoundingClientRect().top + window.pageYOffset + yOffset;
                         window.scrollTo({top: y, behavior: 'smooth'});
                     }
@@ -250,26 +300,49 @@
                 catContainer.appendChild(btn);
             });
 
+            // 瀑布流內容
             listData.forEach((items, category) => {
-                let badgeColor = "bg-gray-100 text-gray-600";
-                if(category.includes("美食")) badgeColor = "bg-orange-100 text-orange-700";
-                if(category.includes("購物") || category.includes("逛街")) badgeColor = "bg-pink-100 text-pink-700";
-                if(category.includes("景點")) badgeColor = "bg-blue-100 text-blue-700";
-                if(category.includes("神社")) badgeColor = "bg-red-100 text-red-700";
-
                 const section = document.createElement('div');
-                section.id = `cat-${category}`; 
-                section.className = "mb-8 animate-slide-up scroll-mt-32";
+                section.id = `cat-${category}`;
+                section.className = "mb-8 opacity-0 animate-fade-in";
+                
+                // 類別標題
+                let badgeClass = "bg-gray-100 text-gray-600";
+                if(category.includes("美食")) badgeClass = "bg-orange-100 text-orange-700";
+                else if(category.includes("購物")) badgeClass = "bg-pink-100 text-pink-700";
+                else if(category.includes("景點")) badgeClass = "bg-blue-100 text-blue-700";
+
                 section.innerHTML = `
-                    <div class="flex items-center gap-2 mb-3 px-1 sticky top-16 z-0 py-2">
-                        <span class="px-2 py-1 rounded text-xs font-bold ${badgeColor}">${category}</span>
-                        <span class="text-xs text-gray-400 font-mono">${items.length}</span>
+                    <div class="flex items-center gap-2 mb-4 px-1 sticky top-16 z-0 pt-2 pb-1 bg-[#fafafa]/90 backdrop-blur-sm w-full">
+                        <span class="px-3 py-1 rounded-lg text-xs font-bold ${badgeClass}">${category}</span>
+                        <span class="text-xs text-gray-400 font-mono">(${items.length})</span>
                     </div>
-                    <div class="grid grid-cols-2 gap-3"></div>
+                    <div class="masonry-grid"></div>
                 `;
                 
-                const grid = section.querySelector('.grid');
-                items.forEach((e, i) => grid.appendChild(createListCard(e, i)));
+                const grid = section.querySelector('.masonry-grid');
+                items.forEach((e, i) => {
+                    const card = document.createElement('div');
+                    card.className = "masonry-item bg-white rounded-2xl p-3 shadow-sm border border-gray-100 hover:shadow-md transition-all cursor-pointer break-inside-avoid relative overflow-hidden group";
+                    card.onclick = () => window.open(e.mapUrl, '_blank');
+
+                    let imgHtml = e.image ? `<div class="mt-2 rounded-xl overflow-hidden w-full"><img src="${e.image}" class="w-full h-auto object-cover"></div>` : '';
+                    let igBtn = e.igUrl ? `<button onclick="event.stopPropagation(); window.open('${e.igUrl}', '_blank')" class="absolute top-3 right-3 btn-instagram w-6 h-6 rounded-full flex items-center justify-center shadow-md transform scale-90 hover:scale-110 transition-transform text-white text-[10px]">Re</button>` : '';
+                    let costHtml = e.cost > 0 ? `<div class="mt-2 text-right border-t border-dashed border-gray-100 pt-2"><span class="text-[10px] font-bold text-slate-400">NT$${e.cost.toLocaleString()}</span></div>` : '';
+
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-lg">${e.icon}</div>
+                            ${igBtn}
+                        </div>
+                        <h3 class="font-bold text-slate-800 text-sm leading-snug group-hover:text-orange-600 mb-1">${e.title}</h3>
+                        ${e.desc ? `<p class="text-gray-400 text-[10px] leading-relaxed line-clamp-2">${e.desc}</p>` : ''}
+                        ${imgHtml}
+                        ${costHtml}
+                    `;
+                    grid.appendChild(card);
+                });
+                
                 container.appendChild(section);
             });
         }
@@ -279,82 +352,11 @@
             scheduleData.forEach((d, i) => {
                 const isActive = i === currentDayIndex;
                 const btn = document.createElement('button');
-                btn.className = `flex-none rounded-xl px-4 py-2.5 transition-all min-w-[5rem] ${isActive ? 'bg-orange-500 text-white shadow-md' : 'text-gray-500 hover:bg-white/50'}`;
-                btn.innerHTML = `<span class="text-xs font-bold block">${d.day}</span><span class="text-[10px] block opacity-80">${d.date.split(' ')[0]}</span>`;
+                btn.className = `flex-none rounded-xl px-4 py-2 transition-all min-w-[4.5rem] flex flex-col items-center justify-center ${isActive ? 'bg-slate-800 text-white shadow-md transform scale-105' : 'text-slate-400 hover:bg-white hover:text-slate-600'}`;
+                btn.innerHTML = `<span class="text-[10px] font-bold uppercase tracking-wider opacity-80">${d.day}</span><span class="text-sm font-bold">${d.date.split(' ')[0]}</span>`;
                 btn.onclick = () => { currentDayIndex = i; renderScheduleMode(); };
                 c.appendChild(btn);
             });
-        }
-
-        function renderEvents(events) {
-            const c = document.getElementById('schedule-list'); c.innerHTML = '';
-            events.forEach((e, i) => c.appendChild(createScheduleCard(e, i)));
-        }
-
-        function createScheduleCard(e, index) {
-            const item = document.createElement('div');
-            item.className = "flex gap-4 items-stretch group opacity-0 animate-slide-up";
-            item.style.animationDelay = `${index * 50}ms`;
-
-            let imgHtml = e.image ? `<div class="mt-3 rounded-xl overflow-hidden h-32"><img src="${e.image}" class="w-full h-full object-cover"></div>` : '';
-            let costHtml = e.cost > 0 ? `<span class="text-[10px] bg-yellow-100 text-yellow-800 px-1.5 py-0.5 rounded font-bold ml-auto">💰$${e.cost.toLocaleString()}</span>` : '';
-            
-            let igBtnHtml = "";
-            if (e.igUrl) {
-                igBtnHtml = `
-                    <button onclick="event.stopPropagation(); window.open('${e.igUrl}', '_blank')" class="mt-2 text-xs flex items-center gap-1 btn-instagram px-2 py-1 rounded transition-all ml-auto">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-                        Reels
-                    </button>`;
-            }
-
-            item.innerHTML = `
-                <div class="flex-none w-[56px] flex flex-col items-center sticky top-28 h-fit">
-                    <span class="text-[10px] font-bold text-gray-400 mb-1.5">${e.time.split(' ')[0]}</span>
-                    <div class="w-12 h-12 rounded-full bg-white border-2 border-orange-100 shadow-sm flex items-center justify-center text-xl group-hover:scale-110 transition-transform">${e.icon}</div>
-                </div>
-                <div class="flex-1 bg-white rounded-2xl p-4 shadow-sm border border-orange-50 hover:border-orange-200 transition-all cursor-pointer" onclick="window.open('${e.mapUrl}', '_blank')">
-                    <div class="flex items-center gap-2 mb-2">
-                        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${e.type.bg} ${e.type.text}">${e.type.label}</span>
-                        ${costHtml}
-                    </div>
-                    <h3 class="font-bold text-slate-800 text-[17px] mb-1 group-hover:text-orange-600 transition-colors">${e.title}</h3>
-                    <p class="text-slate-500 text-sm leading-relaxed">${e.desc}</p>
-                    ${imgHtml}
-                    <div class="flex justify-end">${igBtnHtml}</div>
-                </div>
-            `;
-            return item;
-        }
-
-        function createListCard(e, index) {
-            const item = document.createElement('div');
-            item.className = "bg-white rounded-xl p-3 shadow-sm border border-orange-50/50 hover:border-orange-200 transition-all cursor-pointer flex flex-col opacity-0 animate-slide-up h-full relative";
-            item.style.animationDelay = `${index * 30}ms`;
-            item.onclick = () => window.open(e.mapUrl, '_blank');
-
-            let imgHtml = e.image ? `<div class="mt-2 rounded-lg overflow-hidden h-24 w-full"><img src="${e.image}" class="w-full h-full object-cover"></div>` : '';
-            let costHtml = e.cost > 0 ? `<div class="mt-2 text-right"><span class="text-[10px] bg-gray-50 text-gray-600 px-1.5 py-0.5 rounded">💰$${e.cost.toLocaleString()}</span></div>` : '';
-            
-            let igBtnHtml = "";
-            if (e.igUrl) {
-                igBtnHtml = `
-                    <button onclick="event.stopPropagation(); window.open('${e.igUrl}', '_blank')" class="absolute top-2 right-2 btn-instagram p-1.5 rounded-full shadow-md z-10 transform scale-75 hover:scale-90 transition-transform">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-                    </button>`;
-            }
-
-            item.innerHTML = `
-                ${igBtnHtml}
-                <div class="flex justify-between items-start mb-1">
-                    <span class="text-2xl">${e.icon}</span>
-                </div>
-                <h3 class="font-bold text-slate-800 text-sm leading-snug group-hover:text-orange-600 line-clamp-2">${e.title}</h3>
-                ${e.desc ? `<p class="text-gray-400 text-xs mt-1 line-clamp-1">${e.desc}</p>` : ''}
-                ${imgHtml}
-                ${costHtml}
-            `;
-            return item;
         }
 
         function getType(t) {
@@ -362,7 +364,6 @@
             if(t.includes('trans')) return {bg:'bg-blue-50', text:'text-blue-600', label:'交通'};
             if(t.includes('food')) return {bg:'bg-orange-50', text:'text-orange-600', label:'美食'};
             if(t.includes('stay')) return {bg:'bg-indigo-50', text:'text-indigo-600', label:'住宿'};
-            if(t.includes('shop')) return {bg:'bg-pink-50', text:'text-pink-600', label:'購物'};
             return {bg:'bg-emerald-50', text:'text-emerald-600', label:'活動'};
         }
 
@@ -371,10 +372,9 @@
             setInterval(() => {
                 const now = new Date().getTime();
                 const distance = targetDate - now;
-                if (distance < 0) { document.getElementById("countdown-timer").innerText = "Have Fun!"; return; }
+                if (distance < 0) { document.getElementById("countdown-timer").innerText = "Trip Started!"; return; }
                 const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                document.getElementById("countdown-timer").innerText = `距離出發 ${days} 天 ${hours} 小時`;
+                document.getElementById("countdown-timer").innerText = `COUNTDOWN: ${days} DAYS`;
             }, 1000);
         }
     </script>
