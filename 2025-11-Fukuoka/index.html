@@ -23,7 +23,7 @@
                     },
                     animation: {
                         'float': 'float 6s ease-in-out infinite',
-                        'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+                        'fade-in-up': 'fadeInUp 0.8s ease-out forwards', // 這裡定義的是 fade-in-up
                         'wiggle': 'wiggle 3s ease-in-out infinite',
                     },
                     keyframes: {
@@ -37,16 +37,14 @@
     </script>
 
     <style>
-        body { background-color: #fffbf0; overflow-x: hidden; }
+        body { background-color: #fffbf0; overflow-x: hidden; } 
         .warm-blob { position: absolute; filter: blur(60px); z-index: 0; opacity: 0.4; animation: float 10s ease-in-out infinite; }
-        
         .polaroid-card {
             background: white; padding: 10px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-            border: 1px solid #f3f4f6; transition: all 0.3s;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+            border: 1px solid #f3f4f6; transition: all 0.3s; 
         }
         .polaroid-card:hover { transform: scale(1.02) rotate(1deg); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 10; }
-
         .journal-card {
             background: white; border-radius: 1rem;
             box-shadow: 2px 4px 12px rgba(0,0,0,0.03);
@@ -57,12 +55,10 @@
             width: 80px; height: 20px; background-color: rgba(251, 146, 60, 0.3);
             opacity: 0.8; box-shadow: 0 2px 4px rgba(0,0,0,0.05); z-index: 10;
         }
-
         .sticker { position: absolute; z-index: 20; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1)); }
-        
         .nav-bar {
             position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px);
             border-radius: 2rem; padding: 0.4rem; display: flex; gap: 0.5rem;
             z-index: 100; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
             border: 1px solid rgba(255,255,255,0.5);
@@ -72,12 +68,10 @@
             transition: all 0.3s; display: flex; items-center; gap: 0.4rem;
         }
         .nav-btn.active { background: #ea580c; color: white; box-shadow: 0 4px 10px rgba(234, 88, 12, 0.3); transform: translateY(-2px); }
-
         .btn-instagram {
             background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
             color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.15);
         }
-        
         .timeline-line { 
             position: absolute; left: 24px; top: 20px; bottom: 0; width: 2px; 
             background: repeating-linear-gradient(to bottom, #fdba74 0, #fdba74 5px, transparent 5px, transparent 10px); 
@@ -96,7 +90,6 @@
         <a href="../" class="absolute top-6 left-6 w-10 h-10 bg-white/60 backdrop-blur rounded-full flex items-center justify-center shadow-sm text-stone-500 hover:scale-110 transition-transform z-50">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
         </a>
-
         <div class="text-center mt-12 mb-8 relative">
             <span class="sticker -top-6 -right-2 text-4xl animate-wiggle" style="animation-delay: 1s;">🍜</span>
             <div class="inline-block bg-orange-100/50 px-4 py-1 rounded-full border border-orange-200 mb-3">
@@ -105,26 +98,15 @@
             <h1 class="text-4xl font-display font-bold text-stone-800 mb-2 tracking-tight">福岡<br><span class="text-orange-500 font-hand text-5xl">採買放風之旅</span></h1>
             <div id="countdown-timer" class="text-stone-400 text-sm font-hand mt-2 bg-white/50 inline-block px-3 py-1 rounded-lg backdrop-blur-sm border border-white">計算中...</div>
         </div>
-
         <div class="grid grid-cols-2 gap-4 mb-8">
             <div class="bg-white/70 backdrop-blur rounded-2xl p-4 shadow-sm border border-white relative transform -rotate-1">
                 <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-16 h-4 bg-orange-200/50 rotate-2"></div>
                 <p class="text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-1 font-display">ESTIMATED</p>
-                <div class="flex items-baseline gap-1">
-                    <span class="text-sm font-light opacity-60">$</span>
-                    <span id="total-budget" class="text-2xl font-bold text-stone-700 font-display">0</span>
-                </div>
+                <div class="flex items-baseline gap-1"><span class="text-sm font-light opacity-60">$</span><span id="total-budget" class="text-2xl font-bold text-stone-700 font-display">0</span></div>
             </div>
-            
             <div class="bg-white/70 backdrop-blur rounded-2xl p-4 shadow-sm border border-white relative transform rotate-1 flex flex-col items-center justify-center">
                 <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-16 h-4 bg-yellow-200/50 -rotate-2"></div>
-                <div id="weather-display" class="flex flex-col items-center transition-opacity duration-500">
-                    <span id="weather-icon" class="text-3xl mb-1 animate-float">☀️</span>
-                    <div class="flex items-baseline gap-1">
-                        <span id="weather-temp" class="text-2xl font-bold text-stone-700 font-display">--</span>
-                        <span class="text-xs text-stone-400">°C</span>
-                    </div>
-                </div>
+                <div id="weather-display" class="flex flex-col items-center"><span id="weather-icon" class="text-3xl mb-1 animate-float">☀️</span><div class="flex items-baseline gap-1"><span id="weather-temp" class="text-2xl font-bold text-stone-700 font-display">--</span><span class="text-xs text-stone-400">°C</span></div></div>
             </div>
         </div>
     </div>
@@ -136,13 +118,11 @@
                 <div class="flex overflow-x-auto hide-scrollbar gap-1.5 hidden" id="category-tabs"></div>
             </div>
         </div>
-
         <div class="relative min-h-[400px]">
             <div id="timeline-line" class="timeline-line transition-opacity duration-300"></div>
             <div id="schedule-list" class="space-y-6 relative z-10 pb-10">
                  <div class="flex flex-col items-center justify-center py-20 text-stone-400 font-hand text-xl">
-                    <span class="animate-bounce mb-2">🍜</span>
-                    <p>Loading...</p>
+                    <span class="animate-bounce mb-2">🍜</span><p>Loading...</p>
                 </div>
             </div>
         </div>
@@ -158,7 +138,7 @@
 
         let currentMode = 'schedule';
         let currentDayIndex = 0;
-        let scheduleData = [], listData = new Map();
+        let rawData = [], scheduleData = [], listData = new Map();
 
         window.onload = function() { fetchData(); initWeather(); };
 
@@ -167,8 +147,7 @@
             .then(res => res.json()).then(data => {
                 const temp = Math.round(data.current.temperature_2m);
                 const code = data.current.weather_code;
-                let icon = "☁️";
-                if (code === 0) icon = "☀️"; else if (code >= 1 && code <= 3) icon = "⛅"; else if (code >= 51) icon = "🌧️";
+                let icon = "☁️"; if (code === 0) icon = "☀️"; else if (code >= 51) icon = "🌧️";
                 document.getElementById('weather-temp').innerText = temp;
                 document.getElementById('weather-icon').innerText = icon;
             }).catch(e => console.log(e));
@@ -189,7 +168,6 @@
             raw.forEach(row => {
                 let cost = parseInt((row.cost||"").replace(/[^0-9]/g, '')) || 0; 
                 grandTotal += cost;
-                
                 let mapUrl = row.map_url || (row.title ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(row.title)}` : "");
                 let igUrl = row.instagram || "";
                 if (!igUrl && row.title && !(row.type||"").toLowerCase().includes('transport')) {
@@ -218,7 +196,7 @@
             scheduleData = Array.from(scheduleMap.values());
             document.getElementById('total-budget').innerText = grandTotal.toLocaleString();
             
-            // 判斷顯示模式
+            // 自動切換顯示模式 (如果有行程就顯示行程，不然就顯示清單)
             if (scheduleData.length > 0) {
                 renderScheduleMode();
             } else if (listData.size > 0) {
@@ -256,11 +234,13 @@
             renderTabs();
             const container = document.getElementById('schedule-list');
             container.innerHTML = '';
-            
+            container.className = "space-y-8 pb-24"; 
+
             if(scheduleData.length > 0) {
                 scheduleData[currentDayIndex].events.forEach((e, i) => {
                     const item = document.createElement('div');
-                    item.className = "flex gap-4 items-start group opacity-0 animate-fade-in";
+                    // 【修正】這裡改用正確的動畫 class: animate-fade-in-up
+                    item.className = "flex gap-4 items-start group opacity-0 animate-fade-in-up";
                     item.style.animationDelay = `${i * 50}ms`;
 
                     let imgHtml = e.image ? `<div class="mt-3 rounded-lg overflow-hidden h-36 w-full shadow-inner border border-stone-100 rotate-1"><img src="${e.image}" class="w-full h-full object-cover"></div>` : '';
@@ -289,7 +269,7 @@
                     container.appendChild(item);
                 });
             } else {
-                container.innerHTML = `<div class="text-center py-10 text-stone-400 font-hand">No Schedule</div>`;
+                container.innerHTML = `<div class="text-center py-10 text-stone-400 font-hand">無行程資料</div>`;
             }
         }
 
@@ -298,6 +278,7 @@
             const catContainer = document.getElementById('category-tabs');
             container.innerHTML = '';
             catContainer.innerHTML = ''; 
+            container.className = "pb-24"; 
 
             if (listData.size === 0) return;
 
@@ -318,7 +299,8 @@
             listData.forEach((items, category) => {
                 const section = document.createElement('div');
                 section.id = `cat-${category}`;
-                section.className = "mb-8 opacity-0 animate-fade-in";
+                // 【修正】這裡也修正 class
+                section.className = "mb-8 opacity-0 animate-fade-in-up";
                 
                 let badgeClass = "bg-stone-100 text-stone-600";
                 if(category.includes("美食")) badgeClass = "bg-orange-100 text-orange-700";
@@ -342,7 +324,8 @@
 
                     let imgHtml = e.image ? `<div class="mt-2 h-24 w-full overflow-hidden border border-stone-100"><img src="${e.image}" class="w-full h-full object-cover"></div>` : '';
                     let igBtn = e.igUrl ? `<button onclick="event.stopPropagation(); window.open('${e.igUrl}', '_blank')" class="absolute top-2 right-2 btn-instagram w-6 h-6 rounded-full flex items-center justify-center shadow-md transform scale-90 hover:scale-110 transition-transform text-white text-[10px]">Re</button>` : '';
-                    
+                    let costHtml = e.cost > 0 ? `<div class="mt-2 text-right border-t border-dashed border-gray-100 pt-2"><span class="text-[10px] font-hand font-bold text-stone-400">NT$${e.cost.toLocaleString()}</span></div>` : '';
+
                     card.innerHTML = `
                         <div class="flex justify-between items-start mb-1">
                             <span class="text-xl">${e.icon}</span>
@@ -350,9 +333,7 @@
                         </div>
                         <h3 class="font-bold text-stone-700 text-sm leading-snug mb-1 font-display group-hover:text-orange-500">${e.title}</h3>
                         ${imgHtml}
-                        <div class="mt-2 text-right border-t border-stone-100 pt-1">
-                            <span class="text-[10px] font-hand font-bold text-stone-400">NT$${e.cost.toLocaleString()}</span>
-                        </div>
+                        ${costHtml}
                     `;
                     grid.appendChild(card);
                 });
