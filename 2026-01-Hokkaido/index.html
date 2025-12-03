@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>北海道雪國之旅 ❄️</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['"Inter"', '"Noto Sans TC"', 'sans-serif'], mono: ['"Inter"', 'monospace'] },
+                    animation: { 'slide-up': 'slideUp 0.5s ease-out forwards', 'float': 'float 3s ease-in-out infinite' },
+                    keyframes: {
+                        slideUp: { '0%': { opacity: '0', transform: 'translateY(20px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #f0f9ff; -webkit-tap-highlight-color: transparent; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .glass-header { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.6); }
+        .dashboard-card { background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.4); box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1); }
+        .timeline-line { position: absolute; left: 27px; top: 20px; bottom: 0; width: 2px; background: linear-gradient(to bottom, #bae6fd 50%, rgba(255,255,255,0) 100%); z-index: 0; }
+    </style>
+</head>
+<body class="text-slate-800 antialiased pb-20">
+
+    <div class="relative bg-gradient-to-br from-sky-400 via-blue-500 to-indigo-500 text-white pb-10 pt-12 px-6 rounded-b-[3rem] shadow-2xl overflow-hidden">
+        <div class="absolute top-10 right-10 text-6xl opacity-20 animate-float">❄️</div>
+        <div class="absolute bottom-10 left-0 text-8xl opacity-10 animate-float" style="animation-delay: 1.5s;">☃️</div>
+        
+        <a href="../" class="absolute top-6 left-6 p-2.5 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-full transition-all z-20 shadow-sm border border-white/20">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+        </a>
+
+        <div class="relative z-10 max-w-lg mx-auto">
+            <div class="text-center mt-2 mb-6">
+                <span class="inline-flex items-center gap-1.5 py-1 px-3 rounded-full bg-sky-900/30 backdrop-blur-md text-[10px] font-bold tracking-widest uppercase border border-white/20 shadow-sm">
+                    <span class="w-1.5 h-1.5 rounded-full bg-cyan-300 animate-pulse"></span> Winter 2026
+                </span>
+                <h1 class="text-3xl font-black tracking-tight mt-3 mb-1 drop-shadow-lg">北海道雪國之旅</h1>
+                <p class="text-sky-100 text-sm font-medium opacity-90"><span id="date-range">Loading...</span></p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div class="dashboard-card rounded-2xl p-4 flex flex-col justify-between h-[100px] relative overflow-hidden group">
+                    <div class="absolute -right-4 -top-4 text-6xl opacity-20 rotate-12 group-hover:scale-110 transition-transform">💴</div>
+                    <div>
+                        <p class="text-[10px] text-sky-900 font-bold uppercase tracking-wider mb-1">Total Cost</p>
+                        <div class="flex items-baseline gap-1">
+                            <span class="text-sm font-light opacity-80">$</span>
+                            <span id="total-budget" class="text-2xl font-bold font-mono tracking-tighter text-sky-900">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-card rounded-2xl overflow-hidden h-[100px] relative flex items-center justify-center">
+                    <span class="absolute top-2 left-3 text-[10px] text-sky-900 font-bold uppercase tracking-wider z-10">Sapporo Now</span>
+                    <div class="w-[120%] -ml-2 mt-4 transform scale-90 opacity-95">
+                        <a class="weatherwidget-io" href="https://forecast7.com/en/43d06141d30/sapporo/" data-label_1="" data-label_2="" data-font="Inter" data-icons="Climacons Animated" data-mode="Current" data-theme="pure" data-textcolor="#0c4a6e" >Sapporo</a>
+                        <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src='https://weatherwidget.io/js/widget.min.js';fjs.parentNode.insertBefore(js,fjs);}}(document,'script','weatherwidget-io-js');</script>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-xl mx-auto -mt-6 relative z-20 px-4">
+        <div class="sticky top-4 z-40 mb-6">
+            <div class="glass-header shadow-lg rounded-2xl p-1.5 bg-white/70">
+                <div class="flex overflow-x-auto hide-scrollbar gap-1.5" id="day-tabs"></div>
+            </div>
+        </div>
+        <div class="relative min-h-[400px]" id="schedule-container">
+            <div class="timeline-line"></div>
+            <div id="schedule-list" class="space-y-6 relative z-10 pb-10"></div>
+        </div>
+    </div>
+
+    <script>
+        // 【請在此處貼上您新的 Hokkaido CSV 連結】
+        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT0VzpYNtRMmLw1A39zZtqT4mRAyUpZynYsd_CxtmqYWzC7kXjs-S6Kam7cEPkU3wcK6SlFO1yYwx-O/pub?gid=1000630113&single=true&output=csv';
+
+        let currentDayIndex = 0, tripData = [];
+
+        window.onload = function() { fetchData(); };
+        function fetchData() {
+            Papa.parse(SHEET_URL, {
+                download: true, header: true, skipEmptyLines: true,
+                complete: function(results) { processData(results.data); },
+                error: function(err) { console.error(err); }
+            });
+        }
+
+        function processData(rawData) {
+            const validRows = rawData.filter(row => row.day_group);
+            if (!validRows.length) return;
+            const grouped = new Map(); let grandTotal = 0;
+            validRows.forEach(row => {
+                const dayKey = row.day_group.trim();
+                if (!grouped.has(dayKey)) grouped.set(dayKey, { day: row.day_group, date: row.date||"", events: [] });
+                let cost = parseInt((row.cost||"").replace(/[^0-9]/g, '')) || 0; grandTotal += cost;
+                let mapUrl = row.map_url || (row.title ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(row.title)}` : "");
+                
+                grouped.get(dayKey).events.push({
+                    time: row.time||"", icon: row.icon||"📍", title: row.title||"", desc: row.desc||"",
+                    type: getType(row.type), mapUrl: mapUrl, image: row.image||"", cost: cost
+                });
+            });
+            tripData = Array.from(grouped.values());
+            if(tripData.length){
+                document.getElementById('date-range').innerText = `${tripData[0].date} - ${tripData[tripData.length-1].date}`;
+                document.getElementById('total-budget').innerText = grandTotal.toLocaleString();
+                renderTabs(); renderSchedule();
+            }
+        }
+
+        function getType(t) {
+            t = (t||"").toLowerCase();
+            if(t.includes('trans')) return {bg:'bg-blue-50', text:'text-blue-600', label:'交通'};
+            if(t.includes('food')) return {bg:'bg-orange-50', text:'text-orange-600', label:'美食'};
+            if(t.includes('stay')) return {bg:'bg-indigo-50', text:'text-indigo-600', label:'住宿'};
+            return {bg:'bg-cyan-50', text:'text-cyan-600', label:'活動'};
+        }
+
+        function renderTabs() {
+            const c = document.getElementById('day-tabs'); c.innerHTML = '';
+            tripData.forEach((d, i) => {
+                const isActive = i === currentDayIndex;
+                const btn = document.createElement('button');
+                btn.className = `flex-none rounded-xl px-4 py-2.5 transition-all min-w-[5rem] ${isActive ? 'bg-sky-500 text-white shadow-md' : 'text-gray-500 hover:bg-white/50'}`;
+                btn.innerHTML = `<span class="text-xs font-bold block">${d.day}</span><span class="text-[10px] block opacity-80">${d.date.split(' ')[0]}</span>`;
+                btn.onclick = () => { currentDayIndex = i; renderTabs(); renderSchedule(); };
+                c.appendChild(btn);
+            });
+        }
+
+        function renderSchedule() {
+            const c = document.getElementById('schedule-list'); c.innerHTML = '';
+            tripData[currentDayIndex].events.forEach((e, i) => {
+                const item = document.createElement('div');
+                item.className = "flex gap-4 items-stretch group opacity-0 animate-slide-up";
+                item.style.animationDelay = `${i*100}ms`;
+                
+                let imgHtml = e.image ? `<div class="mt-3 rounded-xl overflow-hidden h-40"><img src="${e.image}" class="w-full h-full object-cover"></div>` : '';
+                let costHtml = e.cost > 0 ? `<span class="text-[10px] bg-yellow-100 text-yellow-800 px-1.5 py-0.5 rounded font-bold ml-auto">💰$${e.cost.toLocaleString()}</span>` : '';
+
+                item.innerHTML = `
+                    <div class="flex-none w-[56px] flex flex-col items-center sticky top-28 h-fit">
+                        <span class="text-[10px] font-bold text-gray-400 mb-1.5">${e.time.split(' ')[0]}</span>
+                        <div class="w-12 h-12 rounded-full bg-white border-2 border-sky-100 shadow-sm flex items-center justify-center text-xl group-hover:scale-110 transition-transform">${e.icon}</div>
+                    </div>
+                    <div class="flex-1 bg-white rounded-2xl p-4 shadow-sm border border-sky-50 hover:border-sky-200 transition-all cursor-pointer" onclick="window.open('${e.mapUrl}', '_blank')">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${e.type.bg} ${e.type.text}">${e.type.label}</span>
+                            ${costHtml}
+                        </div>
+                        <h3 class="font-bold text-slate-800 text-[17px] mb-1 group-hover:text-sky-600 transition-colors">${e.title}</h3>
+                        <p class="text-slate-500 text-sm leading-relaxed">${e.desc}</p>
+                        ${imgHtml}
+                    </div>
+                `;
+                c.appendChild(item);
+            });
+        }
+    </script>
+</body>
+</html>
