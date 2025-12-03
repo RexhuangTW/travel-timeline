@@ -43,7 +43,6 @@
         .trip-card { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .trip-card:hover { transform: translateY(-10px) scale(1.02); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
         
-        /* 天氣卡片樣式優化 */
         .weather-widget-container { 
             border-radius: 1rem; 
             overflow: hidden; 
@@ -51,6 +50,14 @@
             background: white; 
             border: 1px solid #e2e8f0;
             position: relative;
+        }
+
+        /* 統計數據卡片 */
+        .stat-card {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
     </style>
 </head>
@@ -71,7 +78,7 @@
                 <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">Family Log</span>
             </div>
             
-            <h1 class="font-display text-5xl md:text-6xl font-bold text-slate-800 mb-6 leading-tight">
+            <h1 class="font-display text-5xl md:text-6xl font-bold text-slate-800 mb-4 leading-tight">
                 <span class="text-blue-600">Rex</span>, 
                 <span class="text-pink-500">Abby</span> & 
                 <span class="text-yellow-500">Phoebe</span><br>
@@ -79,11 +86,28 @@
             </h1>
             
             <p class="text-xl text-slate-500 max-w-2xl mx-auto font-light mb-8">
-                紀錄我們走過的每一個城市，留下的每一張笑臉。<br>
                 <span id="typing-text" class="font-medium text-slate-700"></span><span class="animate-pulse">|</span>
             </p>
 
-            <div class="max-w-md mx-auto mb-10 weather-widget-container transform hover:scale-105 transition-transform cursor-default group">
+            <div class="grid grid-cols-3 gap-4 max-w-lg mx-auto mb-10">
+                <div class="stat-card rounded-2xl p-3 text-center">
+                    <div class="text-2xl mb-1">✈️</div>
+                    <div class="text-xl font-bold text-slate-700 font-mono">2</div>
+                    <div class="text-[10px] text-slate-400 uppercase tracking-wider">Trips</div>
+                </div>
+                <div class="stat-card rounded-2xl p-3 text-center">
+                    <div class="text-2xl mb-1">🏙️</div>
+                    <div class="text-xl font-bold text-slate-700 font-mono">5</div>
+                    <div class="text-[10px] text-slate-400 uppercase tracking-wider">Cities</div>
+                </div>
+                <div class="stat-card rounded-2xl p-3 text-center">
+                    <div class="text-2xl mb-1">📅</div>
+                    <div class="text-xl font-bold text-slate-700 font-mono">13</div>
+                    <div class="text-[10px] text-slate-400 uppercase tracking-wider">Days</div>
+                </div>
+            </div>
+
+            <div class="max-w-md mx-auto mb-10 weather-widget-container transform hover:scale-105 transition-transform cursor-default group text-left">
                 <div class="bg-slate-50 px-4 py-3 border-b border-slate-100 flex justify-between items-center">
                     <span class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
                         <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
@@ -108,9 +132,7 @@
 
                     <div class="text-right z-10">
                         <div class="text-[10px] text-slate-400 font-medium mb-1">距離出發</div>
-                        <div id="hero-countdown" class="text-lg font-bold text-slate-600 font-mono bg-slate-100 px-2 py-1 rounded-lg">
-                            ...
-                        </div>
+                        <div id="hero-countdown" class="text-lg font-bold text-slate-600 font-mono bg-slate-100 px-2 py-1 rounded-lg">...</div>
                     </div>
 
                     <div id="weather-loading" class="absolute inset-0 bg-white flex items-center justify-center z-20">
@@ -120,13 +142,13 @@
             </div>
 
             <div class="flex justify-center gap-6 mt-8">
-                <div class="text-center group cursor-pointer"><div class="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center text-3xl mb-2 group-hover:scale-110 transition-transform border-2 border-white shadow-lg">👨🏻</div><span class="text-xs font-bold text-slate-400">Dad</span></div>
-                <div class="text-center group cursor-pointer"><div class="w-16 h-16 rounded-full bg-pink-100 flex items-center justify-center text-3xl mb-2 group-hover:scale-110 transition-transform border-2 border-white shadow-lg">👩🏻</div><span class="text-xs font-bold text-slate-400">Mom</span></div>
-                <div class="text-center group cursor-pointer"><div class="w-16 h-16 rounded-full bg-yellow-100 flex items-center justify-center text-3xl mb-2 group-hover:scale-110 transition-transform border-2 border-white shadow-lg">👧🏻</div><span class="text-xs font-bold text-slate-400">Phoebe</span></div>
+                <div class="text-center group cursor-pointer hover:-translate-y-1 transition-transform"><div class="w-14 h-14 rounded-full bg-blue-100 border-2 border-white shadow-md flex items-center justify-center text-2xl mb-1">👨🏻</div><span class="text-xs font-bold text-slate-400">Dad</span></div>
+                <div class="text-center group cursor-pointer hover:-translate-y-1 transition-transform"><div class="w-14 h-14 rounded-full bg-pink-100 border-2 border-white shadow-md flex items-center justify-center text-2xl mb-1">👩🏻</div><span class="text-xs font-bold text-slate-400">Mom</span></div>
+                <div class="text-center group cursor-pointer hover:-translate-y-1 transition-transform"><div class="w-14 h-14 rounded-full bg-yellow-100 border-2 border-white shadow-md flex items-center justify-center text-2xl mb-1">👧🏻</div><span class="text-xs font-bold text-slate-400">Phoebe</span></div>
             </div>
         </header>
 
-        <main class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <main class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
             
             <a href="./2026-01-Hokkaido/" class="trip-card group relative bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100 flex flex-col h-full animate-fade-in-up" style="animation-delay: 0.1s;">
                 <div class="h-56 bg-gradient-to-br from-cyan-400 to-blue-500 relative overflow-hidden">
@@ -135,9 +157,7 @@
                     </div>
                     <div class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-lg text-sm font-bold text-sky-900 shadow-sm">2026.01</div>
                     <div class="absolute bottom-4 right-4">
-                        <span id="card-countdown" class="px-3 py-1 bg-sky-900/80 backdrop-blur text-white text-xs font-mono font-bold rounded-full border border-sky-400/30">
-                            計算中...
-                        </span>
+                        <span id="card-countdown" class="px-3 py-1 bg-sky-900/80 backdrop-blur text-white text-xs font-mono font-bold rounded-full border border-sky-400/30">...</span>
                     </div>
                 </div>
                 <div class="p-8 flex-1 flex flex-col">
@@ -194,12 +214,40 @@
                     </svg>
                 </div>
                 <h3 class="text-lg font-bold text-slate-700">規劃下一站</h3>
-                <p class="text-slate-500 text-sm mt-2 max-w-xs">歐洲？迪士尼郵輪？<br>期待下一次的冒險...</p>
+                <p class="text-slate-500 text-sm mt-2 max-w-xs">迪士尼郵輪？<br>期待下一次的冒險...</p>
             </div>
 
         </main>
 
-        <footer class="text-center mt-20 text-slate-400 text-sm font-light">
+        <section class="max-w-2xl mx-auto mb-20 px-4 animate-fade-in-up" style="animation-delay: 0.4s;">
+            <div class="bg-white/60 backdrop-blur-md rounded-2xl p-6 border border-white shadow-lg">
+                <h3 class="text-lg font-bold text-slate-700 mb-4 flex items-center gap-2">
+                    <span class="text-yellow-500">✨</span> Travel Bucket List
+                </h3>
+                <ul class="space-y-3">
+                    <li class="flex items-center gap-3 text-slate-600 group">
+                        <div class="w-5 h-5 rounded-full border-2 border-slate-300 flex items-center justify-center group-hover:border-blue-400 transition-colors">
+                            <div class="w-3 h-3 bg-blue-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        </div>
+                        <span class="group-hover:text-blue-600 transition-colors">帶 Phoebe 去迪士尼郵輪 🚢</span>
+                    </li>
+                    <li class="flex items-center gap-3 text-slate-600 group">
+                        <div class="w-5 h-5 rounded-full border-2 border-slate-300 flex items-center justify-center group-hover:border-pink-400 transition-colors">
+                            <div class="w-3 h-3 bg-pink-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        </div>
+                        <span class="group-hover:text-pink-600 transition-colors">全家一起去歐洲聖誕市集 🎄</span>
+                    </li>
+                    <li class="flex items-center gap-3 text-slate-600 group">
+                        <div class="w-5 h-5 rounded-full border-2 border-slate-300 flex items-center justify-center group-hover:border-green-400 transition-colors">
+                            <div class="w-3 h-3 bg-green-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        </div>
+                        <span class="group-hover:text-green-600 transition-colors">紐西蘭開露營車 🚐</span>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <footer class="text-center text-slate-400 text-sm font-light pb-12">
             <p>Made with ❤️ by Rex</p>
             <p class="mt-1">© 2025 Family Travel Log</p>
         </footer>
@@ -220,65 +268,38 @@
         }
         document.addEventListener('DOMContentLoaded', type);
 
-        // ==========================================
-        //  【新功能】札幌天氣 API (Open-Meteo)
-        // ==========================================
+        // 天氣初始化 (Sapporo)
         function initRootWeather() {
-            // 札幌座標
             const apiUrl = "https://api.open-meteo.com/v1/forecast?latitude=43.06&longitude=141.35&current=temperature_2m,weather_code&timezone=Asia%2FTokyo";
-            
-            fetch(apiUrl)
-                .then(res => res.json())
-                .then(data => {
-                    const temp = Math.round(data.current.temperature_2m);
-                    const code = data.current.weather_code;
-                    
-                    let icon = "☁️", desc = "Cloudy";
-                    if (code === 0) { icon = "☀️"; desc = "Sunny"; }
-                    else if (code >= 1 && code <= 3) { icon = "⛅"; desc = "Partly Cloudy"; }
-                    else if (code >= 51 && code <= 67) { icon = "🌧️"; desc = "Rain"; }
-                    else if (code >= 71 && code <= 77) { icon = "❄️"; desc = "Snowing"; }
-                    else if (code >= 85 && code <= 86) { icon = "🌨️"; desc = "Heavy Snow"; }
-                    
-                    document.getElementById('weather-temp').innerText = temp;
-                    document.getElementById('weather-icon').innerText = icon;
-                    document.getElementById('weather-desc').innerText = desc;
-                    
-                    // 顯示內容
-                    document.getElementById('weather-loading').style.display = 'none';
-                    document.getElementById('weather-display').classList.remove('opacity-0', 'translate-y-2');
-                })
-                .catch(err => {
-                    console.error("天氣讀取失敗:", err);
-                    document.getElementById('weather-desc').innerText = "Offline";
-                    document.getElementById('weather-loading').style.display = 'none';
-                    document.getElementById('weather-display').classList.remove('opacity-0');
-                });
+            fetch(apiUrl).then(res => res.json()).then(data => {
+                const temp = Math.round(data.current.temperature_2m);
+                const code = data.current.weather_code;
+                let icon = "☁️", desc = "Cloudy";
+                if (code === 0) { icon = "☀️"; desc = "Sunny"; }
+                else if (code >= 1 && code <= 3) { icon = "⛅"; desc = "Partly Cloudy"; }
+                else if (code >= 71 && code <= 77) { icon = "❄️"; desc = "Snowing"; }
+                
+                document.getElementById('weather-temp').innerText = temp;
+                document.getElementById('weather-icon').innerText = icon;
+                document.getElementById('weather-desc').innerText = desc;
+                document.getElementById('weather-loading').style.display = 'none';
+                document.getElementById('weather-display').classList.remove('opacity-0', 'translate-y-2');
+            }).catch(console.error);
         }
-        initRootWeather(); // 執行天氣初始化
+        initRootWeather();
 
-        // ==========================================
-        //  倒數計時邏輯 (北海道 2026/01/24)
-        // ==========================================
+        // 倒數計時 (2026/01/24)
         const targetDate = new Date("2026/01/24 00:00:00").getTime();
-        
         setInterval(() => {
             const now = new Date().getTime();
             const distance = targetDate - now;
-
             if (distance < 0) {
                 document.getElementById("card-countdown").innerText = "Trip Started!";
                 document.getElementById("hero-countdown").innerText = "Enjoy!";
             } else {
                 const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                // 更新卡片上的倒數
-                if(document.getElementById("card-countdown")) {
-                    document.getElementById("card-countdown").innerText = `倒數 ${days} 天`;
-                }
-                // 更新頂部小工具的倒數
-                if(document.getElementById("hero-countdown")) {
-                    document.getElementById("hero-countdown").innerText = `${days} Days`;
-                }
+                if(document.getElementById("card-countdown")) document.getElementById("card-countdown").innerText = `倒數 ${days} 天`;
+                if(document.getElementById("hero-countdown")) document.getElementById("hero-countdown").innerText = `${days} Days`;
             }
         }, 1000);
     </script>
