@@ -27,15 +27,27 @@
         .glass-header { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.6); }
         .dashboard-card { background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.4); box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1); }
         .timeline-line { position: absolute; left: 27px; top: 20px; bottom: 0; width: 2px; background: linear-gradient(to bottom, #bae6fd 50%, rgba(255,255,255,0) 100%); z-index: 0; }
-        .filter-btn.active { background-color: #0ea5e9; color: white; border-color: #0ea5e9; }
+        
+        /* 底部導航樣式 */
+        .nav-bar {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px);
+            border-radius: 2rem; padding: 0.5rem; display: flex; gap: 0.5rem;
+            z-index: 100; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .nav-btn {
+            padding: 0.5rem 1.25rem; border-radius: 1.5rem; color: #94a3b8; font-size: 0.875rem; font-weight: 600;
+            transition: all 0.3s; display: flex; items-center; gap: 0.5rem;
+        }
+        .nav-btn.active { background: white; color: #0f172a; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
     </style>
 </head>
-<body class="text-slate-800 antialiased pb-20">
+<body class="text-slate-800 antialiased pb-32">
 
     <div class="relative bg-gradient-to-br from-sky-400 via-blue-500 to-indigo-500 text-white pb-8 pt-12 px-6 rounded-b-[3rem] shadow-2xl overflow-hidden">
         <div class="absolute top-10 right-10 text-6xl opacity-20 animate-float">❄️</div>
         <div class="absolute bottom-10 left-0 text-8xl opacity-10 animate-float" style="animation-delay: 1.5s;">☃️</div>
-        
         <a href="../" class="absolute top-6 left-6 p-2.5 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-full transition-all z-20 shadow-sm border border-white/20">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
         </a>
@@ -46,10 +58,7 @@
                     <span class="w-1.5 h-1.5 rounded-full bg-cyan-300 animate-pulse"></span> Winter 2026
                 </span>
                 <h1 class="text-3xl font-black tracking-tight mt-3 mb-1 drop-shadow-lg">北海道雪國之旅</h1>
-                
-                <div id="countdown-timer" class="text-sky-100 text-sm font-medium opacity-90 mt-2 font-mono bg-white/10 inline-block px-3 py-1 rounded-lg backdrop-blur-sm border border-white/10">
-                    計算中...
-                </div>
+                <div id="countdown-timer" class="text-sky-100 text-sm font-medium opacity-90 mt-2 font-mono bg-white/10 inline-block px-3 py-1 rounded-lg backdrop-blur-sm border border-white/10">計算中...</div>
             </div>
 
             <div class="grid grid-cols-2 gap-3">
@@ -63,7 +72,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="dashboard-card rounded-2xl overflow-hidden h-[100px] relative flex flex-col items-center justify-center group">
                     <span class="absolute top-2 left-3 text-[10px] text-sky-900 font-bold uppercase tracking-wider z-10 opacity-70">Sapporo Now</span>
                     <div id="weather-display" class="flex items-center justify-center gap-3 mt-2 transition-all duration-500 opacity-0">
@@ -79,33 +87,40 @@
     </div>
 
     <div class="max-w-xl mx-auto -mt-6 relative z-20 px-4">
-        <div class="sticky top-4 z-40 mb-6">
+        
+        <div id="tabs-container" class="sticky top-4 z-40 mb-6 transition-all duration-300">
             <div class="glass-header shadow-lg rounded-2xl p-1.5 bg-white/80">
-                <div class="flex overflow-x-auto hide-scrollbar gap-1.5 mb-2" id="day-tabs"></div>
-                
-                <div class="flex gap-2 overflow-x-auto hide-scrollbar px-1 pb-1 pt-1 border-t border-gray-100" id="filter-container">
-                    </div>
+                <div class="flex overflow-x-auto hide-scrollbar gap-1.5" id="day-tabs"></div>
             </div>
         </div>
-        
-        <div class="relative min-h-[400px]" id="schedule-container">
-            <div class="timeline-line"></div>
-            <div id="schedule-list" class="space-y-6 relative z-10 pb-10"></div>
+
+        <div class="relative min-h-[400px]">
+            <div id="timeline-line" class="timeline-line transition-opacity duration-300"></div>
+            <div id="schedule-list" class="space-y-4 relative z-10 pb-10"></div>
         </div>
     </div>
 
+    <div class="nav-bar">
+        <button onclick="switchMode('schedule')" id="btn-schedule" class="nav-btn active">
+            📅 行程
+        </button>
+        <button onclick="switchMode('list')" id="btn-list" class="nav-btn">
+            📝 清單
+        </button>
+    </div>
+
     <script>
-        // 北海道 CSV
-        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT0VzpYNtRMmLw1A39zZtqT4mRAyUpZynYsd_CxtmqYWzC7kXjs-S6Kam7cEPkU3wcK6SlFO1yYwx-O/pub?gid=1000630113&single=true&output=csv';
+        const SHEET_URL = 'https://docs.https://docs.google.com/spreadsheets/d/e/2PACX-1vT0VzpYNtRMmLw1A39zZtqT4mRAyUpZynYsd_CxtmqYWzC7kXjs-S6Kam7cEPkU3wcK6SlFO1yYwx-O/pub?gid=1000630113&single=true&output=csv.com/spreadsheets/d/e/2PACX-1vT0VzpYNtRMmLw1A39zZtqT4mRAyUpZynYsd_CxtmqYWzC7kXjs-S6Kam7cEPkU3wcK6SlFO1yYwx-O/pub?gid=976514785&single=true&output=csv';
 
+        let currentMode = 'schedule'; // 'schedule' or 'list'
         let currentDayIndex = 0;
-        let tripData = [];
-        let currentFilter = 'all'; // 預設顯示全部
+        let currentListCategory = null;
+        
+        let rawData = [];
+        let scheduleData = []; // 有日期的資料
+        let listData = new Map(); // 無日期的資料 (Map: 類別 -> 項目陣列)
 
-        window.onload = function() { 
-            fetchData(); 
-            initWeather(); 
-        };
+        window.onload = function() { fetchData(); initWeather(); };
 
         function initWeather() {
             const apiUrl = "https://api.open-meteo.com/v1/forecast?latitude=43.06&longitude=141.35&current=temperature_2m,weather_code&timezone=Asia%2FTokyo";
@@ -114,10 +129,8 @@
                 const temp = Math.round(data.current.temperature_2m);
                 let icon = "☁️", desc = "Cloudy";
                 if (code === 0) { icon = "☀️"; desc = "Sunny"; }
-                else if (code >= 1 && code <= 3) { icon = "⛅"; desc = "Cloudy"; }
-                else if (code >= 51 && code <= 67) { icon = "🌧️"; desc = "Rain"; }
                 else if (code >= 71 && code <= 77) { icon = "❄️"; desc = "Snow"; }
-                else if (code >= 85 && code <= 86) { icon = "🌨️"; desc = "Snow"; }
+                else if (code >= 1 && code <= 3) { icon = "⛅"; desc = "Cloudy"; }
                 document.getElementById('weather-temp').innerText = `${temp}°`;
                 document.getElementById('weather-icon').innerText = icon;
                 document.getElementById('weather-desc').innerText = desc;
@@ -132,39 +145,164 @@
             });
         }
 
-        function processData(rawData) {
-            const validRows = rawData.filter(row => row.day_group);
-            if (!validRows.length) return;
-            const grouped = new Map(); let grandTotal = 0;
+        function processData(data) {
+            rawData = data.filter(row => row.day_group);
+            if (!rawData.length) return;
+
+            let grandTotal = 0;
+            const scheduleMap = new Map();
+
+            rawData.forEach(row => {
+                // 費用計算
+                let cost = parseInt((row.cost||"").replace(/[^0-9]/g, '')) || 0; 
+                grandTotal += cost;
+                
+                // 處理資料物件
+                let mapUrl = row.map_url || (row.title ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(row.title)}` : "");
+                const item = {
+                    time: row.time||"", icon: row.icon||"📍", title: row.title||"", desc: row.desc||"",
+                    type: getType(row.type), mapUrl: mapUrl, image: row.image||"", cost: cost,
+                    day: row.day_group
+                };
+
+                // 分流邏輯：有日期 -> 行程；無日期 -> 清單
+                if (row.date && row.date.trim() !== "") {
+                    // 行程資料
+                    const dayKey = row.day_group.trim();
+                    if (!scheduleMap.has(dayKey)) scheduleMap.set(dayKey, { day: row.day_group, date: row.date, events: [] });
+                    scheduleMap.get(dayKey).events.push(item);
+                    
+                    // 倒數計時 (取第一筆日期)
+                    if (scheduleMap.size === 1) startCountdown(`2026/${row.date.split(' ')[0]} 00:00:00`);
+                } else {
+                    // 清單資料
+                    const listKey = row.day_group.trim();
+                    if (!listData.has(listKey)) listData.set(listKey, []);
+                    listData.get(listKey).push(item);
+                }
+            });
+
+            scheduleData = Array.from(scheduleMap.values());
+            document.getElementById('total-budget').innerText = grandTotal.toLocaleString();
             
-            // 抓取第一筆日期作為出發日 (格式假設: 01/24 (六))
-            // 需補上年份 2026
-            if(validRows.length > 0) {
-                const startStr = validRows[0].date.split(' ')[0]; // "01/24"
-                const tripYear = 2026; 
-                startCountdown(`${tripYear}/${startStr} 00:00:00`);
+            // 預設渲染行程模式
+            renderScheduleMode();
+        }
+
+        // --- 模式切換邏輯 ---
+        function switchMode(mode) {
+            currentMode = mode;
+            document.getElementById('btn-schedule').className = `nav-btn ${mode === 'schedule' ? 'active' : ''}`;
+            document.getElementById('btn-list').className = `nav-btn ${mode === 'list' ? 'active' : ''}`;
+            
+            if (mode === 'schedule') {
+                document.getElementById('tabs-container').style.display = 'block';
+                document.getElementById('timeline-line').style.opacity = '1';
+                renderScheduleMode();
+            } else {
+                document.getElementById('tabs-container').style.display = 'none'; // 隱藏日期 Tab
+                document.getElementById('timeline-line').style.opacity = '0'; // 隱藏時間軸線
+                renderListMode();
+            }
+        }
+
+        // --- 渲染：行程模式 ---
+        function renderScheduleMode() {
+            renderTabs();
+            renderEvents(scheduleData[currentDayIndex].events);
+        }
+
+        // --- 渲染：清單模式 ---
+        function renderListMode() {
+            const container = document.getElementById('schedule-list');
+            container.innerHTML = '';
+
+            if (listData.size === 0) {
+                container.innerHTML = `<div class="text-center py-10 text-gray-400">Google Sheet 中沒有「無日期」的清單項目</div>`;
+                return;
             }
 
-            validRows.forEach(row => {
-                const dayKey = row.day_group.trim();
-                if (!grouped.has(dayKey)) grouped.set(dayKey, { day: row.day_group, date: row.date||"", events: [] });
-                let cost = parseInt((row.cost||"").replace(/[^0-9]/g, '')) || 0; grandTotal += cost;
-                let mapUrl = row.map_url || (row.title ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(row.title)}` : "");
-                
-                // 為了篩選，這裡保存原始 type 字串
-                grouped.get(dayKey).events.push({
-                    time: row.time||"", icon: row.icon||"📍", title: row.title||"", desc: row.desc||"",
-                    typeRaw: (row.type||"").toLowerCase(),
-                    type: getType(row.type), mapUrl: mapUrl, image: row.image||"", cost: cost
+            // 產生類別標題與卡片
+            listData.forEach((items, category) => {
+                // 類別標題
+                const header = document.createElement('div');
+                header.className = "flex items-center gap-2 mt-6 mb-3 px-2";
+                header.innerHTML = `
+                    <div class="h-6 w-1 bg-sky-500 rounded-full"></div>
+                    <h3 class="font-bold text-lg text-slate-700">${category}</h3>
+                    <span class="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">${items.length}</span>
+                `;
+                container.appendChild(header);
+
+                // 該類別的項目
+                items.forEach(e => {
+                    const card = createCard(e, false); // false = 不顯示左側時間軸
+                    container.appendChild(card);
                 });
             });
-            tripData = Array.from(grouped.values());
-            if(tripData.length){
-                document.getElementById('total-budget').innerText = grandTotal.toLocaleString();
-                renderTabs(); 
-                renderFilters(); // 渲染篩選按鈕
-                renderSchedule();
+        }
+
+        function renderTabs() {
+            const c = document.getElementById('day-tabs'); c.innerHTML = '';
+            scheduleData.forEach((d, i) => {
+                const isActive = i === currentDayIndex;
+                const btn = document.createElement('button');
+                btn.className = `flex-none rounded-xl px-4 py-2.5 transition-all min-w-[5rem] ${isActive ? 'bg-sky-500 text-white shadow-md' : 'text-gray-500 hover:bg-white/50'}`;
+                btn.innerHTML = `<span class="text-xs font-bold block">${d.day}</span><span class="text-[10px] block opacity-80">${d.date.split(' ')[0]}</span>`;
+                btn.onclick = () => { currentDayIndex = i; renderScheduleMode(); };
+                c.appendChild(btn);
+            });
+        }
+
+        function renderEvents(events) {
+            const c = document.getElementById('schedule-list'); c.innerHTML = '';
+            events.forEach((e, i) => {
+                const card = createCard(e, true, i);
+                c.appendChild(card);
+            });
+        }
+
+        // 通用卡片產生器
+        function createCard(e, hasTimeline, index = 0) {
+            const item = document.createElement('div');
+            item.className = "flex gap-4 items-stretch group opacity-0 animate-slide-up";
+            item.style.animationDelay = `${index * 50}ms`;
+
+            let imgHtml = e.image ? `<div class="mt-3 rounded-xl overflow-hidden h-32"><img src="${e.image}" class="w-full h-full object-cover"></div>` : '';
+            let costHtml = e.cost > 0 ? `<span class="text-[10px] bg-yellow-100 text-yellow-800 px-1.5 py-0.5 rounded font-bold ml-auto">💰$${e.cost.toLocaleString()}</span>` : '';
+            
+            // 時間軸部分 (僅在行程模式顯示)
+            let timelineHtml = '';
+            if (hasTimeline) {
+                timelineHtml = `
+                    <div class="flex-none w-[56px] flex flex-col items-center sticky top-28 h-fit">
+                        <span class="text-[10px] font-bold text-gray-400 mb-1.5">${e.time.split(' ')[0]}</span>
+                        <div class="w-12 h-12 rounded-full bg-white border-2 border-sky-100 shadow-sm flex items-center justify-center text-xl group-hover:scale-110 transition-transform">${e.icon}</div>
+                    </div>`;
+            } else {
+                // 清單模式的 Icon
+                timelineHtml = `
+                    <div class="flex-none w-[16px] flex flex-col items-center pt-4">
+                         <div class="w-2 h-2 rounded-full bg-gray-200"></div>
+                    </div>`;
             }
+
+            item.innerHTML = `
+                ${timelineHtml}
+                <div class="flex-1 bg-white rounded-2xl p-4 shadow-sm border border-sky-50 hover:border-sky-200 transition-all cursor-pointer" onclick="window.open('${e.mapUrl}', '_blank')">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${e.type.bg} ${e.type.text}">${e.type.label}</span>
+                        ${costHtml}
+                    </div>
+                    <div class="flex justify-between items-start">
+                        <h3 class="font-bold text-slate-800 text-[17px] mb-1 group-hover:text-sky-600 transition-colors">${e.title}</h3>
+                        ${!hasTimeline ? `<span class="text-xl">${e.icon}</span>` : ''} 
+                    </div>
+                    <p class="text-slate-500 text-sm leading-relaxed">${e.desc}</p>
+                    ${imgHtml}
+                </div>
+            `;
+            return item;
         }
 
         function getType(t) {
@@ -172,106 +310,20 @@
             if(t.includes('trans')) return {bg:'bg-blue-50', text:'text-blue-600', label:'交通'};
             if(t.includes('food')) return {bg:'bg-orange-50', text:'text-orange-600', label:'美食'};
             if(t.includes('stay')) return {bg:'bg-indigo-50', text:'text-indigo-600', label:'住宿'};
+            if(t.includes('shop')) return {bg:'bg-pink-50', text:'text-pink-600', label:'購物'};
             return {bg:'bg-cyan-50', text:'text-cyan-600', label:'活動'};
         }
 
-        // 【功能4】倒數計時邏輯
         function startCountdown(dateString) {
             const targetDate = new Date(dateString).getTime();
-            
             setInterval(() => {
                 const now = new Date().getTime();
                 const distance = targetDate - now;
-
-                if (distance < 0) {
-                    document.getElementById("countdown-timer").innerText = "旅程進行中！Have Fun!";
-                    return;
-                }
-
+                if (distance < 0) { document.getElementById("countdown-timer").innerText = "Have Fun!"; return; }
                 const days = Math.floor(distance / (1000 * 60 * 60 * 24));
                 const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                
-                document.getElementById("countdown-timer").innerHTML = 
-                    `距離出發 <span class="text-white font-bold text-lg">${days}</span> 天 <span class="text-white font-bold">${hours}</span> 小時`;
+                document.getElementById("countdown-timer").innerText = `距離出發 ${days} 天 ${hours} 小時`;
             }, 1000);
-        }
-
-        // 【功能1】渲染篩選按鈕
-        function renderFilters() {
-            const container = document.getElementById('filter-container');
-            const filters = [
-                { id: 'all', label: '全部' },
-                { id: 'food', label: '美食 🍜' },
-                { id: 'activity', label: '景點 📷' },
-                { id: 'stay', label: '住宿 🏨' },
-                { id: 'transport', label: '交通 ✈️' }
-            ];
-
-            container.innerHTML = filters.map(f => `
-                <button onclick="setFilter('${f.id}')" 
-                    class="filter-btn flex-none px-3 py-1 rounded-full text-xs font-medium border border-gray-200 text-gray-500 transition-colors ${currentFilter === f.id ? 'active' : 'bg-white'}">
-                    ${f.label}
-                </button>
-            `).join('');
-        }
-
-        function setFilter(filterId) {
-            currentFilter = filterId;
-            renderFilters(); // 更新按鈕狀態
-            renderSchedule(); // 重新渲染列表
-        }
-
-        function renderTabs() {
-            const c = document.getElementById('day-tabs'); c.innerHTML = '';
-            tripData.forEach((d, i) => {
-                const isActive = i === currentDayIndex;
-                const btn = document.createElement('button');
-                btn.className = `flex-none rounded-xl px-4 py-2.5 transition-all min-w-[5rem] ${isActive ? 'bg-sky-500 text-white shadow-md' : 'text-gray-500 hover:bg-white/50'}`;
-                btn.innerHTML = `<span class="text-xs font-bold block">${d.day}</span><span class="text-[10px] block opacity-80">${d.date.split(' ')[0]}</span>`;
-                btn.onclick = () => { currentDayIndex = i; renderTabs(); renderSchedule(); };
-                c.appendChild(btn);
-            });
-        }
-
-        function renderSchedule() {
-            const c = document.getElementById('schedule-list'); c.innerHTML = '';
-            
-            // 【功能1】過濾行程
-            const allEvents = tripData[currentDayIndex].events;
-            const filteredEvents = currentFilter === 'all' 
-                ? allEvents 
-                : allEvents.filter(e => e.typeRaw.includes(currentFilter) || (currentFilter === 'activity' && !e.typeRaw.includes('food') && !e.typeRaw.includes('stay') && !e.typeRaw.includes('trans')));
-
-            if (filteredEvents.length === 0) {
-                c.innerHTML = `<div class="text-center py-10 text-gray-400 text-sm">此類別當天沒有行程</div>`;
-                return;
-            }
-
-            filteredEvents.forEach((e, i) => {
-                const item = document.createElement('div');
-                item.className = "flex gap-4 items-stretch group opacity-0 animate-slide-up";
-                item.style.animationDelay = `${i*50}ms`; // 稍微加快
-                
-                let imgHtml = e.image ? `<div class="mt-3 rounded-xl overflow-hidden h-40"><img src="${e.image}" class="w-full h-full object-cover"></div>` : '';
-                let costHtml = e.cost > 0 ? `<span class="text-[10px] bg-yellow-100 text-yellow-800 px-1.5 py-0.5 rounded font-bold ml-auto">💰$${e.cost.toLocaleString()}</span>` : '';
-
-                item.innerHTML = `
-                    <div class="flex-none w-[56px] flex flex-col items-center sticky top-40 h-fit">
-                        <span class="text-[10px] font-bold text-gray-400 mb-1.5">${e.time.split(' ')[0]}</span>
-                        <div class="w-12 h-12 rounded-full bg-white border-2 border-sky-100 shadow-sm flex items-center justify-center text-xl group-hover:scale-110 transition-transform">${e.icon}</div>
-                    </div>
-                    <div class="flex-1 bg-white rounded-2xl p-4 shadow-sm border border-sky-50 hover:border-sky-200 transition-all cursor-pointer" onclick="window.open('${e.mapUrl}', '_blank')">
-                        <div class="flex items-center gap-2 mb-2">
-                            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${e.type.bg} ${e.type.text}">${e.type.label}</span>
-                            ${costHtml}
-                        </div>
-                        <h3 class="font-bold text-slate-800 text-[17px] mb-1 group-hover:text-sky-600 transition-colors">${e.title}</h3>
-                        <p class="text-slate-500 text-sm leading-relaxed">${e.desc}</p>
-                        ${imgHtml}
-                    </div>
-                `;
-                c.appendChild(item);
-            });
         }
     </script>
 </body>
