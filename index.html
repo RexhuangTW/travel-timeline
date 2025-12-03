@@ -15,7 +15,7 @@
                 extend: {
                     fontFamily: {
                         sans: ['"Noto Sans TC"', 'sans-serif'],
-                        display: ['"Fredoka"', 'sans-serif'], // 圓潤可愛的字體，適合家庭主題
+                        display: ['"Fredoka"', 'sans-serif'],
                     },
                     animation: {
                         'float': 'float 6s ease-in-out infinite',
@@ -43,7 +43,6 @@
             overflow-x: hidden;
         }
         
-        /* 裝飾背景球 */
         .blob {
             position: absolute;
             filter: blur(50px);
@@ -51,19 +50,12 @@
             opacity: 0.6;
         }
         
-        /* 卡片 Hover 3D 效果 */
         .trip-card {
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .trip-card:hover {
             transform: translateY(-10px) scale(1.02);
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        }
-        
-        /* 圖片容器遮罩 */
-        .card-image-wrapper {
-            mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
-            -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
         }
     </style>
 </head>
@@ -114,27 +106,27 @@
 
         <main class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             
-            <a href="./2025-tokyo/" class="trip-card group relative bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100 flex flex-col h-full animate-fade-in-up" style="animation-delay: 0.2s;">
-                <div class="h-56 bg-gradient-to-br from-blue-400 to-indigo-600 relative overflow-hidden">
+            <a href="./2025-11-Fukuoka/" class="trip-card group relative bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100 flex flex-col h-full animate-fade-in-up" style="animation-delay: 0.2s;">
+                <div class="h-56 bg-gradient-to-br from-red-400 to-orange-500 relative overflow-hidden">
                     <div class="absolute inset-0 flex items-center justify-center">
-                        <span class="text-9xl opacity-20 group-hover:scale-125 transition-transform duration-700">🗼</span>
+                        <span class="text-9xl opacity-20 group-hover:scale-125 transition-transform duration-700">🍜</span>
                     </div>
-                    <div class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-lg text-sm font-bold text-indigo-900 shadow-sm">
-                        2025
+                    <div class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-lg text-sm font-bold text-orange-800 shadow-sm">
+                        2025.11
                     </div>
                 </div>
                 
                 <div class="p-8 flex-1 flex flex-col">
                     <div class="flex justify-between items-start mb-4">
                         <div>
-                            <h2 class="text-2xl font-bold text-slate-800 group-hover:text-blue-600 transition-colors">東京探索</h2>
-                            <p class="text-sm text-slate-400">Dec 01 - Dec 05</p>
+                            <h2 class="text-2xl font-bold text-slate-800 group-hover:text-red-600 transition-colors">福岡採買放風</h2>
+                            <p class="text-sm text-slate-400">九州 • 福岡</p>
                         </div>
                         <span class="text-2xl">🇯🇵</span>
                     </div>
                     
                     <p class="text-slate-600 leading-relaxed mb-6 line-clamp-3">
-                        迪士尼樂園的煙火、淺草寺的清晨，以及台場的鋼彈。這是 Phoebe 第一次去迪士尼！
+                        博多運河城購物、太宰府天滿宮參拜，當然不能錯過屋台拉麵與牛腸鍋！全家人的輕鬆放風之旅。
                     </p>
                     
                     <div class="mt-auto flex items-center justify-between border-t border-slate-100 pt-4">
@@ -143,7 +135,7 @@
                             <div class="w-8 h-8 rounded-full bg-pink-100 border-2 border-white flex items-center justify-center text-xs">👩🏻</div>
                             <div class="w-8 h-8 rounded-full bg-yellow-100 border-2 border-white flex items-center justify-center text-xs">👧🏻</div>
                         </div>
-                        <span class="text-blue-600 text-sm font-bold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                        <span class="text-red-500 text-sm font-bold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
                             View Trip <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
                         </span>
                     </div>
@@ -158,7 +150,7 @@
                 </div>
                 <h3 class="text-lg font-bold text-slate-700">規劃下一站</h3>
                 <p class="text-slate-500 text-sm mt-2 max-w-xs">
-                    期待下一次的冒險...<br>是京都？還是北海道？
+                    東京？北海道？<br>期待下一次的冒險...
                 </p>
             </div>
 
@@ -171,7 +163,6 @@
     </div>
 
     <script>
-        // 打字機特效
         const textElement = document.getElementById('typing-text');
         const phrases = ["一起看世界 🌍", "收集美好回憶 📸", "品嚐各地美食 🍜", "大手牽小手 👨‍👩‍👧"];
         let phraseIndex = 0;
@@ -185,16 +176,16 @@
             if (isDeleting) {
                 textElement.textContent = currentPhrase.substring(0, charIndex - 1);
                 charIndex--;
-                typeSpeed = 50; // 刪除速度快一點
+                typeSpeed = 50; 
             } else {
                 textElement.textContent = currentPhrase.substring(0, charIndex + 1);
                 charIndex++;
-                typeSpeed = 150; // 打字速度
+                typeSpeed = 150; 
             }
 
             if (!isDeleting && charIndex === currentPhrase.length) {
                 isDeleting = true;
-                typeSpeed = 2000; // 打完一句後停留 2 秒
+                typeSpeed = 2000; 
             } else if (isDeleting && charIndex === 0) {
                 isDeleting = false;
                 phraseIndex = (phraseIndex + 1) % phrases.length;
