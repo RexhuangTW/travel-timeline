@@ -8,6 +8,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Noto+Sans+TC:wght@400;700&family=Patrick+Hand&display=swap" rel="stylesheet">
     
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
     <script>
         tailwind.config = {
             theme: {
@@ -15,34 +18,21 @@
                     fontFamily: {
                         sans: ['"Noto Sans TC"', 'sans-serif'],
                         display: ['"Fredoka"', 'sans-serif'],
-                        hand: ['"Patrick Hand"', 'cursive'], // 手寫字體
+                        hand: ['"Patrick Hand"', 'cursive'],
                     },
                     colors: {
-                        cream: '#fffdf5',
-                        paper: '#fdf6e3',
-                        warm: {
-                            50: '#fff7ed', 100: '#ffedd5', 200: '#fed7aa', 
-                            500: '#f97316', 800: '#9a3412', 900: '#7c2d12'
-                        }
+                        warm: { 50: '#fff7ed', 100: '#ffedd5', 200: '#fed7aa', 500: '#f97316' }
                     },
                     animation: {
                         'float': 'float 6s ease-in-out infinite',
                         'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
                         'wiggle': 'wiggle 3s ease-in-out infinite',
+                        'spin-slow': 'spin 8s linear infinite',
                     },
                     keyframes: {
-                        float: {
-                            '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-10px)' },
-                        },
-                        fadeInUp: {
-                            '0%': { opacity: '0', transform: 'translateY(30px)' },
-                            '100%': { opacity: '1', transform: 'translateY(0)' },
-                        },
-                        wiggle: {
-                            '0%, 100%': { transform: 'rotate(-3deg)' },
-                            '50%': { transform: 'rotate(3deg)' },
-                        }
+                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } },
+                        fadeInUp: { '0%': { opacity: '0', transform: 'translateY(30px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+                        wiggle: { '0%, 100%': { transform: 'rotate(-3deg)' }, '50%': { transform: 'rotate(3deg)' } }
                     }
                 }
             }
@@ -50,33 +40,33 @@
     </script>
 
     <style>
-        body { background-color: #fffbf0; overflow-x: hidden; } /* 奶油底色 */
+        body { background-color: #fffbf0; overflow-x: hidden; }
+        .warm-blob { position: absolute; filter: blur(60px); z-index: 0; opacity: 0.5; animation: float 10s ease-in-out infinite; }
         
-        /* 柔和背景光暈 */
-        .warm-blob {
-            position: absolute; filter: blur(60px); z-index: 0; opacity: 0.5;
-            animation: float 10s ease-in-out infinite;
-        }
-
-        /* 拍立得卡片效果 */
         .polaroid-card {
-            background: white;
-            padding: 12px 12px 24px 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 10px 15px -3px rgba(0, 0, 0, 0.05);
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            transform: rotate(-1deg);
+            background: white; padding: 12px 12px 24px 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            transition: all 0.3s; transform: rotate(-1deg);
         }
-        .polaroid-card:hover {
-            transform: rotate(0deg) scale(1.02) translateY(-5px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            z-index: 10;
-        }
-        .polaroid-card:nth-child(even) { transform: rotate(1deg); } /* 讓卡片稍微歪歪的比較自然 */
+        .polaroid-card:hover { transform: rotate(0deg) scale(1.02) translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); z-index: 10; }
+        .polaroid-card:nth-child(even) { transform: rotate(1deg); }
         .polaroid-card:nth-child(even):hover { transform: rotate(0deg) scale(1.02) translateY(-5px); }
 
-        /* 貼紙樣式 */
-        .sticker {
-            position: absolute; z-index: 20; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1));
+        .sticker { position: absolute; z-index: 20; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1)); }
+
+        /* 地圖容器樣式 */
+        #map-container {
+            border: 8px solid white;
+            border-radius: 2rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transform: rotate(1deg);
+        }
+        /* 自訂地圖標記 */
+        .custom-pin {
+            background: none; border: none;
+            font-size: 24px; text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            animation: float 2s ease-in-out infinite;
         }
     </style>
 </head>
@@ -85,12 +75,11 @@
     <div class="fixed inset-0 z-0 pointer-events-none">
         <div class="warm-blob w-96 h-96 bg-orange-200 rounded-full top-0 left-0 -translate-x-1/2 -translate-y-1/2"></div>
         <div class="warm-blob w-80 h-80 bg-rose-200 rounded-full bottom-0 right-0 translate-x-1/3 translate-y-1/3" style="animation-delay: 2s;"></div>
-        <div class="warm-blob w-64 h-64 bg-yellow-200 rounded-full top-1/2 right-10 opacity-30" style="animation-delay: 4s;"></div>
     </div>
 
     <div class="relative z-10 max-w-5xl mx-auto px-6 py-12">
         
-        <header class="text-center mb-16 animate-fade-in-up">
+        <header class="text-center mb-12 animate-fade-in-up">
             <div class="inline-block relative">
                 <span class="sticker -top-4 -right-6 text-3xl animate-wiggle">✈️</span>
                 <div class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/60 backdrop-blur border border-white shadow-sm mb-4">
@@ -99,70 +88,60 @@
             </div>
             
             <h1 class="font-display text-5xl md:text-6xl font-bold text-stone-800 mb-4 tracking-tight">
-                <span class="text-sky-500">Rex</span>, 
-                <span class="text-rose-400">Abby</span> & 
-                <span class="text-amber-400">Phoebe</span>
+                <span class="text-sky-500">Rex</span>, <span class="text-rose-400">Abby</span> & <span class="text-amber-400">Phoebe</span>
             </h1>
-            <p class="text-xl text-stone-500 font-hand">
-                大手牽小手，一起去郊遊 🎈
-            </p>
+            <p class="text-xl text-stone-500 font-hand">大手牽小手，一起去郊遊 🎈</p>
 
             <div class="mt-10 max-w-3xl mx-auto bg-white/70 backdrop-blur-md rounded-3xl p-6 shadow-sm border border-white grid grid-cols-1 md:grid-cols-3 gap-6 relative">
                 <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-32 h-6 bg-yellow-100/80 rotate-1 shadow-sm transform skew-x-12"></div>
-
+                
                 <div class="flex flex-col justify-center items-center border-r border-stone-100 last:border-0 md:border-b-0 border-b pb-4 md:pb-0">
                     <div class="text-sm font-bold text-stone-400 font-display mb-2">MEMORIES</div>
                     <div class="flex gap-4 text-center">
-                        <div>
-                            <span class="block text-2xl font-bold text-stone-700">2</span>
-                            <span class="text-xs text-stone-400">旅程</span>
-                        </div>
-                        <div>
-                            <span class="block text-2xl font-bold text-stone-700">5</span>
-                            <span class="text-xs text-stone-400">城市</span>
-                        </div>
+                        <div><span class="block text-2xl font-bold text-stone-700">2</span><span class="text-xs text-stone-400">Trips</span></div>
+                        <div><span class="block text-2xl font-bold text-stone-700">5</span><span class="text-xs text-stone-400">Cities</span></div>
                     </div>
                 </div>
-
                 <div class="flex flex-col justify-center items-center border-r border-stone-100 last:border-0 md:border-b-0 border-b pb-4 md:pb-0">
                     <div class="text-sm font-bold text-stone-400 font-display mb-1">NEXT STOP</div>
-                    <div class="text-lg font-bold text-sky-600 flex items-center gap-1">
-                        ❄️ Sapporo
-                    </div>
-                    <div id="hero-countdown" class="text-stone-500 text-sm font-hand mt-1 bg-stone-100 px-3 py-1 rounded-full">
-                        Loading...
-                    </div>
+                    <div class="text-lg font-bold text-sky-600 flex items-center gap-1">❄️ Sapporo</div>
+                    <div id="hero-countdown" class="text-stone-500 text-sm font-hand mt-1 bg-stone-100 px-3 py-1 rounded-full">Loading...</div>
                 </div>
-
                 <div class="flex flex-col justify-center items-center relative">
                     <div class="text-sm font-bold text-stone-400 font-display mb-1">CURRENTLY</div>
                     <div id="weather-loading" class="absolute inset-0 flex items-center justify-center bg-white/80 z-10"><div class="animate-spin w-5 h-5 border-2 border-stone-200 border-t-stone-400 rounded-full"></div></div>
                     <div id="weather-display" class="flex items-center gap-3 opacity-0 transition-opacity duration-500">
                         <span id="weather-icon" class="text-3xl">☁️</span>
-                        <div class="text-left">
-                            <span id="weather-temp" class="text-2xl font-bold text-stone-700">--</span>
-                            <span class="text-sm text-stone-400">°C</span>
-                        </div>
+                        <div class="text-left"><span id="weather-temp" class="text-2xl font-bold text-stone-700">--</span><span class="text-sm text-stone-400">°C</span></div>
                     </div>
                 </div>
             </div>
         </header>
 
+        <section class="max-w-4xl mx-auto mb-16 animate-fade-in-up" style="animation-delay: 0.2s;">
+            <div class="relative">
+                <span class="sticker -top-6 -left-4 text-4xl transform -rotate-12">📍</span>
+                <span class="sticker -bottom-4 -right-4 text-3xl transform rotate-12">🌏</span>
+                
+                <div id="map-container" class="h-[300px] w-full z-0 bg-blue-50"></div>
+                
+                <div class="absolute bottom-4 left-4 bg-white/90 backdrop-blur px-4 py-2 rounded-xl shadow-md z-[400] pointer-events-none">
+                    <p class="text-xs font-bold text-stone-400 uppercase tracking-widest">Our Footprints</p>
+                    <p class="text-stone-700 font-hand text-lg">凡走過必留下痕跡</p>
+                </div>
+            </div>
+        </section>
+
         <main class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 mb-24 px-4">
-            
             <a href="./2026-01-Hokkaido/" class="polaroid-card group cursor-pointer block">
                 <div class="relative h-64 bg-stone-100 overflow-hidden rounded-sm mb-4">
                     <div class="absolute inset-0 bg-gradient-to-br from-blue-100 to-indigo-200 opacity-50"></div>
                     <div class="absolute inset-0 flex items-center justify-center text-6xl group-hover:scale-110 transition-transform duration-700">☃️</div>
-                    <div class="absolute top-3 left-3 bg-white/90 backdrop-blur px-3 py-1 text-xs font-bold text-stone-600 rounded-full shadow-sm">
-                        2026.01
-                    </div>
+                    <div class="absolute top-3 left-3 bg-white/90 backdrop-blur px-3 py-1 text-xs font-bold text-stone-600 rounded-full shadow-sm">2026.01</div>
                 </div>
                 <div class="px-2">
                     <h2 class="text-2xl font-bold text-stone-800 font-display mb-2 group-hover:text-sky-500 transition-colors">北海道雪國之旅</h2>
-                    <p class="text-stone-500 text-sm leading-relaxed font-hand text-lg mb-4 line-clamp-2">
-                        要在星野渡假村滑雪，還要帶 Phoebe 去看企鵝散步！
-                    </p>
+                    <p class="text-stone-500 text-sm leading-relaxed font-hand text-lg mb-4 line-clamp-2">要在星野渡假村滑雪，還要帶 Phoebe 去看企鵝散步！</p>
                     <div class="flex justify-between items-center border-t border-stone-100 pt-3">
                         <div class="flex -space-x-2">
                             <div class="w-8 h-8 rounded-full bg-blue-100 border-2 border-white flex items-center justify-center text-xs">👨🏻</div>
@@ -178,15 +157,11 @@
                 <div class="relative h-64 bg-stone-100 overflow-hidden rounded-sm mb-4">
                     <div class="absolute inset-0 bg-gradient-to-br from-orange-100 to-red-100 opacity-50"></div>
                     <div class="absolute inset-0 flex items-center justify-center text-6xl group-hover:scale-110 transition-transform duration-700">🍜</div>
-                    <div class="absolute top-3 left-3 bg-white/90 backdrop-blur px-3 py-1 text-xs font-bold text-stone-600 rounded-full shadow-sm">
-                        2025.11
-                    </div>
+                    <div class="absolute top-3 left-3 bg-white/90 backdrop-blur px-3 py-1 text-xs font-bold text-stone-600 rounded-full shadow-sm">2025.11</div>
                 </div>
                 <div class="px-2">
                     <h2 class="text-2xl font-bold text-stone-800 font-display mb-2 group-hover:text-orange-500 transition-colors">福岡採買放風</h2>
-                    <p class="text-stone-500 text-sm leading-relaxed font-hand text-lg mb-4 line-clamp-2">
-                        全家人的吃貨之旅，拉麵、牛腸鍋、屋台美食吃透透。
-                    </p>
+                    <p class="text-stone-500 text-sm leading-relaxed font-hand text-lg mb-4 line-clamp-2">全家人的吃貨之旅，拉麵、牛腸鍋、屋台美食吃透透。</p>
                     <div class="flex justify-between items-center border-t border-stone-100 pt-3">
                         <div class="flex -space-x-2">
                             <div class="w-8 h-8 rounded-full bg-blue-100 border-2 border-white flex items-center justify-center text-xs">👨🏻</div>
@@ -200,55 +175,45 @@
 
             <div class="polaroid-card group block relative">
                 <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-red-400 shadow-sm z-20 border-2 border-white"></div>
-                
                 <div class="h-full bg-yellow-50/50 rounded-sm p-6 flex flex-col">
                     <div class="flex items-center gap-2 mb-4">
                         <span class="text-2xl">✨</span>
                         <h3 class="text-xl font-bold text-stone-700 font-display">Bucket List</h3>
                     </div>
-                    
                     <ul class="space-y-4 flex-1">
-                        <li class="flex items-center gap-3">
-                            <div class="w-4 h-4 rounded border-2 border-stone-300"></div>
-                            <span class="font-hand text-xl text-stone-600">迪士尼郵輪 🚢</span>
-                        </li>
-                        <li class="flex items-center gap-3">
-                            <div class="w-4 h-4 rounded border-2 border-stone-300"></div>
-                            <span class="font-hand text-xl text-stone-600">歐洲聖誕市集 🎄</span>
-                        </li>
-                        <li class="flex items-center gap-3">
-                            <div class="w-4 h-4 rounded border-2 border-stone-300"></div>
-                            <span class="font-hand text-xl text-stone-600">紐西蘭露營車 🚐</span>
-                        </li>
+                        <li class="flex items-center gap-3"><div class="w-4 h-4 rounded border-2 border-stone-300"></div><span class="font-hand text-xl text-stone-600">迪士尼郵輪 🚢</span></li>
+                        <li class="flex items-center gap-3"><div class="w-4 h-4 rounded border-2 border-stone-300"></div><span class="font-hand text-xl text-stone-600">歐洲聖誕市集 🎄</span></li>
+                        <li class="flex items-center gap-3"><div class="w-4 h-4 rounded border-2 border-stone-300"></div><span class="font-hand text-xl text-stone-600">紐西蘭露營車 🚐</span></li>
                     </ul>
-                    
-                    <div class="mt-4 pt-4 border-t border-stone-200/50 text-center">
-                        <p class="text-xs text-stone-400 font-display tracking-widest">FUTURE ADVENTURES</p>
-                    </div>
+                    <div class="mt-4 pt-4 border-t border-stone-200/50 text-center"><p class="text-xs text-stone-400 font-display tracking-widest">FUTURE ADVENTURES</p></div>
                 </div>
             </div>
-
         </main>
 
         <footer class="text-center pb-12">
-            <div class="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-sm text-xs font-bold text-stone-400">
-                <span>Made with ❤️ by Rex</span>
-            </div>
+            <div class="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-sm text-xs font-bold text-stone-400"><span>Made with ❤️ by Rex</span></div>
         </footer>
     </div>
 
+    <div class="fixed bottom-6 right-6 z-50">
+        <button id="bgm-toggle" class="w-12 h-12 bg-white rounded-full shadow-lg border border-stone-100 flex items-center justify-center text-xl transition-all hover:scale-110 hover:rotate-12 group">
+            <span id="bgm-icon">🎵</span>
+            <span id="bgm-wave" class="absolute inset-0 rounded-full border-2 border-orange-300 opacity-0 group-hover:animate-ping"></span>
+        </button>
+        <audio id="bgm-audio" loop>
+            <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112191.mp3" type="audio/mpeg">
+        </audio>
+    </div>
+
     <script>
-        // 天氣初始化 (Sapporo)
+        // 1. 天氣
         function initRootWeather() {
             const apiUrl = "https://api.open-meteo.com/v1/forecast?latitude=43.06&longitude=141.35&current=temperature_2m,weather_code&timezone=Asia%2FTokyo";
             fetch(apiUrl).then(res => res.json()).then(data => {
                 const temp = Math.round(data.current.temperature_2m);
                 const code = data.current.weather_code;
                 let icon = "☁️";
-                if (code === 0) icon = "☀️";
-                else if (code >= 71) icon = "❄️";
-                else if (code >= 51) icon = "🌧️";
-                
+                if (code === 0) icon = "☀️"; else if (code >= 71) icon = "❄️"; else if (code >= 51) icon = "🌧️";
                 document.getElementById('weather-temp').innerText = temp;
                 document.getElementById('weather-icon').innerText = icon;
                 document.getElementById('weather-loading').style.display = 'none';
@@ -257,18 +222,66 @@
         }
         initRootWeather();
 
-        // 倒數計時 (2026/01/24)
+        // 2. 倒數
         const targetDate = new Date("2026/01/24 00:00:00").getTime();
         setInterval(() => {
             const now = new Date().getTime();
             const distance = targetDate - now;
-            if (distance < 0) {
-                document.getElementById("hero-countdown").innerText = "Enjoy!";
-            } else {
+            if (distance < 0) document.getElementById("hero-countdown").innerText = "Enjoy!";
+            else {
                 const days = Math.floor(distance / (1000 * 60 * 60 * 24));
                 document.getElementById("hero-countdown").innerText = `倒數 ${days} 天`;
             }
         }, 1000);
+
+        // 3. 足跡地圖 (Leaflet)
+        // 使用 CartoDB 的淺色地圖圖層，比較溫馨
+        const map = L.map('map-container', { 
+            zoomControl: false, 
+            scrollWheelZoom: false,
+            dragging: false, // 固定地圖不讓拉動，當作裝飾
+            attributionControl: false
+        }).setView([38, 138], 4); // 聚焦日本
+
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            maxZoom: 19
+        }).addTo(map);
+
+        // 自訂圖標
+        const createIcon = (emoji) => L.divIcon({
+            className: 'custom-pin',
+            html: `<div style="font-size:24px;">${emoji}</div>`,
+            iconSize: [30, 30],
+            iconAnchor: [15, 30]
+        });
+
+        // 標記地點：台北、福岡、札幌
+        L.marker([25.03, 121.56], {icon: createIcon('🏠')}).addTo(map); // 台北
+        L.marker([33.59, 130.40], {icon: createIcon('🍜')}).addTo(map); // 福岡
+        L.marker([43.06, 141.35], {icon: createIcon('❄️')}).addTo(map); // 札幌
+
+        // 4. 背景音樂控制
+        const bgmBtn = document.getElementById('bgm-toggle');
+        const bgmAudio = document.getElementById('bgm-audio');
+        const bgmIcon = document.getElementById('bgm-icon');
+        const bgmWave = document.getElementById('bgm-wave');
+        let isPlaying = false;
+
+        bgmBtn.addEventListener('click', () => {
+            if (isPlaying) {
+                bgmAudio.pause();
+                bgmIcon.innerText = "🎵";
+                bgmWave.classList.remove('animate-ping');
+                bgmWave.style.opacity = '0';
+            } else {
+                bgmAudio.volume = 0.5; // 音量小一點比較不吵
+                bgmAudio.play().catch(e => alert("請先與頁面互動才能播放音樂"));
+                bgmIcon.innerText = "⏸";
+                bgmWave.style.opacity = '1';
+                bgmWave.classList.add('animate-ping');
+            }
+            isPlaying = !isPlaying;
+        });
     </script>
 </body>
 </html>
