@@ -362,4 +362,21 @@
             if(t.includes('trans')) return {bg:'bg-blue-50', text:'text-blue-600', label:'交通'};
             if(t.includes('food')) return {bg:'bg-orange-50', text:'text-orange-600', label:'美食'};
             if(t.includes('stay')) return {bg:'bg-indigo-50', text:'text-indigo-600', label:'住宿'};
-            if(t.includes('shop')) return {bg:'bg-pink-50', text:'text
+            if(t.includes('shop')) return {bg:'bg-pink-50', text:'text-pink-600', label:'購物'};
+            return {bg:'bg-emerald-50', text:'text-emerald-600', label:'活動'};
+        }
+
+        function startCountdown(dateString) {
+            const targetDate = new Date(dateString).getTime();
+            setInterval(() => {
+                const now = new Date().getTime();
+                const distance = targetDate - now;
+                if (distance < 0) { document.getElementById("countdown-timer").innerText = "Have Fun!"; return; }
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                document.getElementById("countdown-timer").innerText = `距離出發 ${days} 天 ${hours} 小時`;
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
