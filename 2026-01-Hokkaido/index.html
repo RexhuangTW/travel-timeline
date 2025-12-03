@@ -20,7 +20,8 @@
                     },
                     colors: {
                         warm: { 50: '#fff7ed', 100: '#ffedd5', 200: '#fed7aa', 500: '#f97316' },
-                        ice: { 50: '#f0f9ff', 100: '#e0f2fe', 500: '#0ea5e9', 600: '#0284c7' }
+                        // 北海道主題色：冰藍
+                        snow: { 100: '#e0f2fe', 500: '#0ea5e9', 600: '#0284c7' } 
                     },
                     animation: {
                         'float': 'float 6s ease-in-out infinite',
@@ -38,16 +39,17 @@
     </script>
 
     <style>
-        body { background-color: #fffbf0; overflow-x: hidden; } /* 奶油底色 */
+        body { background-color: #f8fafc; -webkit-tap-highlight-color: transparent; } /* 雪白底色 */
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
         
-        /* 背景光暈 (改為冷色調呼應北海道) */
-        .warm-blob { position: absolute; filter: blur(60px); z-index: 0; opacity: 0.4; animation: float 10s ease-in-out infinite; }
+        /* 背景光暈 (冷色系) */
+        .cool-blob { position: absolute; filter: blur(60px); z-index: 0; opacity: 0.4; animation: float 10s ease-in-out infinite; }
         
         /* 拍立得卡片 (清單模式) */
         .polaroid-card {
             background: white; padding: 10px;
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
-            border: 1px solid #f3f4f6;
+            border: 1px solid #f1f5f9;
             transition: all 0.3s; 
         }
         .polaroid-card:hover { transform: scale(1.02) rotate(1deg); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 10; }
@@ -58,12 +60,15 @@
             box-shadow: 2px 4px 12px rgba(0,0,0,0.03);
             border: 1px solid rgba(255,255,255,0.8);
             position: relative;
+            transition: transform 0.3s;
         }
-        /* 紙膠帶裝飾 */
+        .journal-card:hover { transform: translateY(-3px); box-shadow: 4px 8px 20px rgba(14, 165, 233, 0.1); }
+
+        /* 紙膠帶裝飾 (冰藍色) */
         .washi-tape {
             position: absolute; top: -10px; left: 50%; transform: translateX(-50%) rotate(-2deg);
-            width: 80px; height: 20px; background-color: rgba(14, 165, 233, 0.2);
-            opacity: 0.7; box-shadow: 0 2px 4px rgba(0,0,0,0.05); z-index: 10;
+            width: 80px; height: 18px; background-color: rgba(125, 211, 252, 0.4); 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); z-index: 10; opacity: 0.9;
         }
 
         .sticker { position: absolute; z-index: 20; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1)); }
@@ -85,59 +90,60 @@
         /* IG 按鈕 */
         .btn-instagram {
             background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-            color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+            color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         
+        /* 虛線時間軸 (藍色) */
         .timeline-line { 
             position: absolute; left: 24px; top: 20px; bottom: 0; width: 2px; 
-            background: repeating-linear-gradient(to bottom, #bae6fd 0, #bae6fd 5px, transparent 5px, transparent 10px); /* 虛線 */
+            background-image: linear-gradient(to bottom, #bae6fd 50%, transparent 50%);
+            background-size: 2px 10px; 
             z-index: 0; 
         }
     </style>
 </head>
-<body class="text-stone-700 antialiased pb-32">
+<body class="text-slate-600 antialiased pb-32 selection:bg-sky-100 selection:text-sky-900">
 
     <div class="fixed inset-0 z-0 pointer-events-none">
-        <div class="warm-blob w-96 h-96 bg-sky-200 rounded-full top-0 left-0 -translate-x-1/2 -translate-y-1/2"></div>
-        <div class="warm-blob w-80 h-80 bg-indigo-100 rounded-full bottom-0 right-0 translate-x-1/3 translate-y-1/3" style="animation-delay: 2s;"></div>
+        <div class="cool-blob w-96 h-96 bg-sky-100 rounded-full top-0 left-0 -translate-x-1/2 -translate-y-1/2"></div>
+        <div class="cool-blob w-80 h-80 bg-indigo-100 rounded-full bottom-0 right-0 translate-x-1/3 translate-y-1/3" style="animation-delay: 2s;"></div>
     </div>
 
     <div class="relative z-10 max-w-lg mx-auto px-6 py-8">
-        
-        <a href="../" class="absolute top-6 left-6 w-10 h-10 bg-white/60 backdrop-blur rounded-full flex items-center justify-center shadow-sm text-stone-500 hover:scale-110 transition-transform z-50">
+        <a href="../" class="absolute top-6 left-6 w-10 h-10 flex items-center justify-center bg-white/60 backdrop-blur rounded-full shadow-sm text-slate-500 hover:scale-110 transition-transform z-20">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
         </a>
 
         <div class="text-center mt-12 mb-8 relative">
             <span class="sticker -top-6 -right-2 text-4xl animate-wiggle" style="animation-delay: 1s;">☃️</span>
-            <div class="inline-block bg-sky-100/50 px-4 py-1 rounded-full border border-sky-200 mb-3">
+            <div class="inline-block bg-sky-100/60 px-4 py-1 rounded-full border border-sky-200 mb-3">
                 <span class="text-xs font-bold text-sky-700 tracking-widest font-display">WINTER 2026</span>
             </div>
-            <h1 class="text-4xl font-display font-bold text-stone-800 mb-2 tracking-tight">北海道<br><span class="text-sky-500 font-hand text-5xl">雪國之旅</span></h1>
-            
-            <div id="countdown-timer" class="text-stone-400 text-sm font-hand mt-2 bg-white/50 inline-block px-3 py-1 rounded-lg backdrop-blur-sm border border-white">
+            <h1 class="text-4xl font-display font-bold text-slate-800 mb-2 tracking-tight">
+                北海道<br><span class="text-sky-500 font-hand text-5xl">雪國之旅</span>
+            </h1>
+            <div id="countdown-timer" class="text-slate-400 text-sm font-hand mt-2 bg-white/50 inline-block px-3 py-1 rounded-lg backdrop-blur-sm border border-white">
                 計算中...
             </div>
         </div>
 
         <div class="grid grid-cols-2 gap-4 mb-8">
-            <div class="bg-white/70 backdrop-blur rounded-2xl p-4 shadow-sm border border-white relative transform -rotate-1">
+            <div class="bg-white/70 backdrop-blur rounded-2xl p-4 shadow-sm border border-white relative transform -rotate-1 hover:rotate-0 transition-transform">
                 <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-16 h-4 bg-yellow-200/50 rotate-2"></div>
-                <p class="text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-1 font-display">ESTIMATED</p>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 font-display">ESTIMATED</p>
                 <div class="flex items-baseline gap-1">
                     <span class="text-sm font-light opacity-60">$</span>
-                    <span id="total-budget" class="text-2xl font-bold text-stone-700 font-display">0</span>
+                    <span id="total-budget" class="text-2xl font-bold text-slate-700 font-display">0</span>
                 </div>
             </div>
             
-            <div class="bg-white/70 backdrop-blur rounded-2xl p-4 shadow-sm border border-white relative transform rotate-1 flex flex-col items-center justify-center">
+            <div class="bg-white/70 backdrop-blur rounded-2xl p-4 shadow-sm border border-white relative transform rotate-1 hover:rotate-0 transition-transform flex flex-col items-center justify-center">
                 <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-16 h-4 bg-sky-200/50 -rotate-2"></div>
-                <div id="weather-loading" class="animate-spin w-5 h-5 border-2 border-stone-200 border-t-sky-400 rounded-full"></div>
-                <div id="weather-display" class="flex flex-col items-center opacity-0 transition-opacity duration-500">
+                <div id="weather-display" class="flex flex-col items-center">
                     <span id="weather-icon" class="text-3xl mb-1 animate-float">❄️</span>
                     <div class="flex items-baseline gap-1">
-                        <span id="weather-temp" class="text-2xl font-bold text-stone-700 font-display">--</span>
-                        <span class="text-xs text-stone-400">°C</span>
+                        <span id="weather-temp" class="text-2xl font-bold text-slate-700 font-display">--</span>
+                        <span class="text-xs text-slate-400">°C</span>
                     </div>
                 </div>
             </div>
@@ -145,9 +151,8 @@
     </div>
 
     <div class="max-w-xl mx-auto px-4 relative z-20">
-        
         <div id="sticky-header" class="sticky top-4 z-30 mb-6 transition-all duration-300">
-            <div class="bg-white/80 backdrop-blur-md shadow-sm rounded-full p-1.5 border border-white/50">
+            <div class="bg-white/80 backdrop-blur-md shadow-sm rounded-2xl p-1.5 border border-white/50">
                 <div class="flex overflow-x-auto hide-scrollbar gap-1.5" id="day-tabs"></div>
                 <div class="flex overflow-x-auto hide-scrollbar gap-1.5 hidden" id="category-tabs"></div>
             </div>
@@ -155,11 +160,10 @@
 
         <div class="relative min-h-[400px]">
             <div id="timeline-line" class="timeline-line transition-opacity duration-300"></div>
-            
             <div id="schedule-list" class="space-y-6 relative z-10 pb-10">
-                 <div class="flex flex-col items-center justify-center py-20 text-stone-400 font-hand text-xl">
+                 <div class="flex flex-col items-center justify-center py-20 text-slate-400 font-hand text-xl">
                     <span class="animate-bounce mb-2">❄️</span>
-                    <p>Loading Trip...</p>
+                    <p>Loading...</p>
                 </div>
             </div>
         </div>
@@ -170,63 +174,51 @@
         <button onclick="switchMode('list')" id="btn-list" class="nav-btn">📝 清單</button>
     </div>
 
-    <div class="fixed bottom-6 right-6 z-50">
-        <button id="bgm-toggle" class="w-12 h-12 bg-white/80 backdrop-blur rounded-full shadow-md border border-white flex items-center justify-center text-xl transition-all hover:scale-110 group">
-            <span id="bgm-icon">🎵</span>
-        </button>
-        <audio id="bgm-audio" loop>
-            <source src="https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3?filename=winter-magic-15389.mp3" type="audio/mpeg">
-        </audio>
-    </div>
-
     <script>
+        // 北海道 CSV 連結
         const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT0VzpYNtRMmLw1A39zZtqT4mRAyUpZynYsd_CxtmqYWzC7kXjs-S6Kam7cEPkU3wcK6SlFO1yYwx-O/pub?gid=1000630113&single=true&output=csv';
 
         let currentMode = 'schedule';
         let currentDayIndex = 0;
-        let rawData = [], scheduleData = [], listData = new Map();
+        let scheduleData = [], listData = new Map();
 
         window.onload = function() { fetchData(); initWeather(); };
 
-        // 天氣 (札幌)
         function initWeather() {
-            const apiUrl = "https://api.open-meteo.com/v1/forecast?latitude=43.06&longitude=141.35&current=temperature_2m,weather_code&timezone=Asia%2FTokyo";
-            fetch(apiUrl).then(res => res.json()).then(data => {
+            // 札幌 (Sapporo)
+            fetch("https://api.open-meteo.com/v1/forecast?latitude=43.06&longitude=141.35&current=temperature_2m,weather_code&timezone=Asia%2FTokyo")
+            .then(res => res.json()).then(data => {
                 const temp = Math.round(data.current.temperature_2m);
                 const code = data.current.weather_code;
-                let icon = "☁️";
-                if (code === 0) icon = "☀️"; 
-                else if (code >= 71) icon = "❄️"; 
-                else if (code >= 51) icon = "🌧️";
-                
+                let icon = "☁️"; if (code === 0) icon = "☀️"; else if (code >= 71) icon = "❄️"; else if (code >= 51) icon = "🌧️";
                 document.getElementById('weather-temp').innerText = temp;
                 document.getElementById('weather-icon').innerText = icon;
-                document.getElementById('weather-loading').style.display = 'none';
-                document.getElementById('weather-display').classList.remove('opacity-0');
-            }).catch(console.error);
+            }).catch(e => console.log(e));
         }
 
         function fetchData() {
             Papa.parse(SHEET_URL, {
                 download: true, header: true, skipEmptyLines: true,
-                complete: function(results) { processData(results.data); }
+                complete: function(results) { processData(results.data); },
+                error: function(err) { alert("讀取失敗，請確認 CSV 連結"); }
             });
         }
 
         function processData(data) {
-            rawData = data.filter(row => row.day_group);
-            if (!rawData.length) return;
+            const raw = data.filter(row => row.day_group);
+            if (raw.length === 0) {
+                document.getElementById('schedule-list').innerHTML = `<div class="text-center py-10 text-slate-400 font-hand">Empty</div>`;
+                return;
+            }
 
             let grandTotal = 0;
             const scheduleMap = new Map();
 
-            rawData.forEach(row => {
+            raw.forEach(row => {
                 let cost = parseInt((row.cost||"").replace(/[^0-9]/g, '')) || 0; 
                 grandTotal += cost;
                 
                 let mapUrl = row.map_url || (row.title ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(row.title)}` : "");
-                
-                // IG
                 let igUrl = row.instagram || "";
                 if (!igUrl && row.title && !(row.type||"").toLowerCase().includes('transport')) {
                     const cleanTitle = row.title.replace(/[ .\/\\()（）-]/g, '');
@@ -253,64 +245,70 @@
 
             scheduleData = Array.from(scheduleMap.values());
             document.getElementById('total-budget').innerText = grandTotal.toLocaleString();
-            renderScheduleMode();
+            
+            // 預設邏輯：優先顯示行程，若無則顯示清單
+            if (scheduleData.length > 0) {
+                renderScheduleMode();
+            } else if (listData.size > 0) {
+                switchMode('list');
+            }
         }
 
         function switchMode(mode) {
             currentMode = mode;
-            document.getElementById('btn-schedule').className = `nav-btn ${mode === 'schedule' ? 'active' : ''}`;
-            document.getElementById('btn-list').className = `nav-btn ${mode === 'list' ? 'active' : ''}`;
-            
-            const dayTabs = document.getElementById('day-tabs');
-            const catTabs = document.getElementById('category-tabs');
+            const btnSchedule = document.getElementById('btn-schedule');
+            const btnList = document.getElementById('btn-list');
+            const activeClass = "bg-sky-500 text-white shadow-md transform -translate-y-0.5";
+            const inactiveClass = "text-slate-400 hover:bg-white hover:text-slate-600";
 
             if (mode === 'schedule') {
+                btnSchedule.className = `nav-btn ${activeClass}`;
+                btnList.className = `nav-btn ${inactiveClass}`;
                 document.getElementById('timeline-line').style.opacity = '1';
-                dayTabs.classList.remove('hidden');
-                catTabs.classList.add('hidden');
+                document.getElementById('day-tabs').classList.remove('hidden');
+                document.getElementById('category-tabs').classList.add('hidden');
                 renderScheduleMode();
             } else {
+                btnList.className = `nav-btn ${activeClass}`;
+                btnSchedule.className = `nav-btn ${inactiveClass}`;
                 document.getElementById('timeline-line').style.opacity = '0';
-                dayTabs.classList.add('hidden');
-                catTabs.classList.remove('hidden');
+                document.getElementById('day-tabs').classList.add('hidden');
+                document.getElementById('category-tabs').classList.remove('hidden');
                 renderListMode();
             }
         }
 
-        // 行程模式 (Journal Style)
         function renderScheduleMode() {
             renderTabs();
             const container = document.getElementById('schedule-list');
             container.innerHTML = '';
-            container.className = "space-y-8 pb-24"; // 加大間距
+            container.className = "space-y-8 pb-24"; 
 
             if(scheduleData.length > 0) {
                 scheduleData[currentDayIndex].events.forEach((e, i) => {
                     const item = document.createElement('div');
-                    item.className = "flex gap-4 items-start group opacity-0 animate-fade-in";
+                    item.className = "flex gap-4 items-start group opacity-0 animate-fade-in-up";
                     item.style.animationDelay = `${i * 50}ms`;
 
-                    let imgHtml = e.image ? `<div class="mt-3 rounded-lg overflow-hidden h-36 w-full shadow-inner border border-stone-100 rotate-1"><img src="${e.image}" class="w-full h-full object-cover"></div>` : '';
+                    let imgHtml = e.image ? `<div class="mt-3 rounded-lg overflow-hidden h-36 w-full shadow-inner border border-slate-100 rotate-1 bg-slate-50"><img src="${e.image}" class="w-full h-full object-cover"></div>` : '';
                     let igBtn = e.igUrl ? `<button onclick="event.stopPropagation(); window.open('${e.igUrl}', '_blank')" class="ml-auto btn-instagram text-[10px] px-2.5 py-1 rounded-full font-bold flex items-center gap-1 transition-transform hover:scale-105 shadow-sm text-white"><span>📷</span> Reels</button>` : '';
-                    let costHtml = e.cost > 0 ? `<span class="text-[10px] font-bold text-stone-400 font-mono">NT$${e.cost.toLocaleString()}</span>` : '';
+                    let costHtml = e.cost > 0 ? `<span class="text-[10px] font-bold text-slate-400 font-mono">NT$${e.cost.toLocaleString()}</span>` : '';
 
                     item.innerHTML = `
                         <div class="flex-none w-[50px] flex flex-col items-center relative z-10">
                             <div class="sticky top-28 flex flex-col items-center">
-                                <span class="text-xs font-hand font-bold text-stone-400 mb-1">${e.time.split(' ')[0]}</span>
-                                <div class="w-10 h-10 rounded-full bg-white border-2 border-dashed border-stone-200 shadow-sm flex items-center justify-center text-lg z-10 group-hover:rotate-12 transition-transform">${e.icon}</div>
+                                <span class="text-xs font-hand font-bold text-slate-400 mb-1">${e.time.split(' ')[0]}</span>
+                                <div class="w-10 h-10 rounded-full bg-white border-2 border-dashed border-slate-200 shadow-sm flex items-center justify-center text-lg z-10 group-hover:rotate-12 transition-transform">${e.icon}</div>
                             </div>
                         </div>
-                        
                         <div class="flex-1 journal-card p-4 hover:shadow-md transition-all cursor-pointer" onclick="window.open('${e.mapUrl}', '_blank')">
                             <div class="washi-tape"></div>
-                            
                             <div class="flex justify-between items-start mb-1">
-                                <span class="px-2 py-0.5 rounded text-[10px] font-bold ${e.type.bg} ${e.type.text}">${e.type.label}</span>
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold font-display ${e.type.bg} ${e.type.text}">${e.type.label}</span>
                                 ${costHtml}
                             </div>
-                            <h3 class="font-bold text-stone-700 text-lg mb-1 leading-snug group-hover:text-sky-600 transition-colors font-display">${e.title}</h3>
-                            <p class="text-stone-500 text-sm leading-relaxed font-hand">${e.desc}</p>
+                            <h3 class="font-bold text-slate-700 text-lg mb-1 leading-snug group-hover:text-sky-500 transition-colors font-display">${e.title}</h3>
+                            <p class="text-slate-500 text-sm leading-relaxed font-hand">${e.desc}</p>
                             ${imgHtml}
                             <div class="mt-3 flex items-center justify-end">${igBtn}</div>
                         </div>
@@ -318,11 +316,10 @@
                     container.appendChild(item);
                 });
             } else {
-                container.innerHTML = `<div class="text-center py-10 text-stone-400 font-hand">Empty Page...</div>`;
+                container.innerHTML = `<div class="text-center py-10 text-slate-400 font-hand">No Schedule</div>`;
             }
         }
 
-        // 清單模式 (Masonry Polaroid Style)
         function renderListMode() {
             const container = document.getElementById('schedule-list');
             const catContainer = document.getElementById('category-tabs');
@@ -332,10 +329,9 @@
 
             if (listData.size === 0) return;
 
-            // 分類按鈕
             listData.forEach((_, category) => {
                 const btn = document.createElement('button');
-                btn.className = "flex-none px-4 py-1.5 rounded-full text-sm font-hand font-bold bg-white text-stone-500 border border-stone-200 hover:bg-sky-50 hover:text-sky-600 transition-all";
+                btn.className = "flex-none px-4 py-1.5 rounded-full text-sm font-hand font-bold bg-white text-slate-500 border border-slate-200 hover:bg-sky-50 hover:text-sky-600 transition-all";
                 btn.innerText = category;
                 btn.onclick = () => {
                     const section = document.getElementById(`cat-${category}`);
@@ -347,20 +343,19 @@
                 catContainer.appendChild(btn);
             });
 
-            // 瀑布流內容
             listData.forEach((items, category) => {
                 const section = document.createElement('div');
                 section.id = `cat-${category}`;
-                section.className = "mb-8 opacity-0 animate-fade-in";
+                section.className = "mb-8 opacity-0 animate-fade-in-up";
                 
-                let badgeClass = "bg-stone-100 text-stone-600";
+                let badgeClass = "bg-slate-100 text-slate-600";
                 if(category.includes("美食")) badgeClass = "bg-orange-100 text-orange-700";
-                else if(category.includes("景點")) badgeClass = "bg-sky-100 text-sky-700";
+                else if(category.includes("購物")) badgeClass = "bg-pink-100 text-pink-700";
 
                 section.innerHTML = `
                     <div class="flex items-center gap-2 mb-4 px-1 sticky top-16 z-0 pt-2 pb-1 bg-[#fffbf0]/90 backdrop-blur-sm w-full">
-                        <span class="px-3 py-1 rounded-md text-xs font-bold font-display ${badgeClass}">${category}</span>
-                        <span class="text-xs text-stone-400 font-mono">(${items.length})</span>
+                        <span class="px-3 py-1 rounded-lg text-xs font-bold font-display ${badgeClass}">${category}</span>
+                        <span class="text-xs text-slate-400 font-mono">(${items.length})</span>
                     </div>
                     <div class="grid grid-cols-2 gap-4"></div>
                 `;
@@ -368,25 +363,23 @@
                 const grid = section.querySelector('.grid');
                 items.forEach((e, i) => {
                     const card = document.createElement('div');
-                    // 拍立得樣式：隨機微幅旋轉
                     const rotateDeg = (i % 2 === 0) ? '-1deg' : '1deg';
                     card.className = "polaroid-card cursor-pointer group relative";
                     card.style.transform = `rotate(${rotateDeg})`;
                     card.onclick = () => window.open(e.mapUrl, '_blank');
 
-                    let imgHtml = e.image ? `<div class="mt-2 h-24 w-full overflow-hidden border border-stone-100"><img src="${e.image}" class="w-full h-full object-cover"></div>` : '';
+                    let imgHtml = e.image ? `<div class="mt-2 h-24 w-full overflow-hidden border border-slate-100 bg-slate-50"><img src="${e.image}" class="w-full h-full object-cover"></div>` : '';
                     let igBtn = e.igUrl ? `<button onclick="event.stopPropagation(); window.open('${e.igUrl}', '_blank')" class="absolute top-2 right-2 btn-instagram w-6 h-6 rounded-full flex items-center justify-center shadow-md transform scale-90 hover:scale-110 transition-transform text-white text-[10px]">Re</button>` : '';
-                    
+                    let costHtml = e.cost > 0 ? `<div class="mt-2 text-right border-t border-dashed border-slate-200 pt-1"><span class="text-[10px] font-hand font-bold text-slate-400">NT$${e.cost.toLocaleString()}</span></div>` : '';
+
                     card.innerHTML = `
                         <div class="flex justify-between items-start mb-1">
                             <span class="text-xl">${e.icon}</span>
                             ${igBtn}
                         </div>
-                        <h3 class="font-bold text-stone-700 text-sm leading-snug mb-1 font-display group-hover:text-sky-600">${e.title}</h3>
+                        <h3 class="font-bold text-slate-700 text-sm leading-snug mb-1 font-display group-hover:text-sky-500">${e.title}</h3>
                         ${imgHtml}
-                        <div class="mt-2 text-right border-t border-stone-100 pt-1">
-                            <span class="text-[10px] font-hand font-bold text-stone-400">NT$${e.cost.toLocaleString()}</span>
-                        </div>
+                        ${costHtml}
                     `;
                     grid.appendChild(card);
                 });
@@ -399,7 +392,7 @@
             scheduleData.forEach((d, i) => {
                 const isActive = i === currentDayIndex;
                 const btn = document.createElement('button');
-                btn.className = `flex-none rounded-xl px-3 py-2 transition-all min-w-[4rem] flex flex-col items-center justify-center ${isActive ? 'bg-sky-500 text-white shadow-md transform scale-105' : 'text-stone-400 hover:bg-white hover:text-stone-600'}`;
+                btn.className = `flex-none rounded-xl px-3 py-2 transition-all min-w-[4rem] flex flex-col items-center justify-center ${isActive ? 'bg-sky-500 text-white shadow-md transform scale-105' : 'text-slate-400 hover:bg-white hover:text-slate-600'}`;
                 btn.innerHTML = `<span class="text-[10px] font-bold uppercase tracking-wider opacity-80 font-display">${d.day}</span><span class="text-xs font-bold font-hand">${d.date.split(' ')[0]}</span>`;
                 btn.onclick = () => { currentDayIndex = i; renderScheduleMode(); };
                 c.appendChild(btn);
@@ -421,20 +414,9 @@
                 const distance = targetDate - now;
                 if (distance < 0) { document.getElementById("countdown-timer").innerText = "Trip Started!"; return; }
                 const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                document.getElementById("countdown-timer").innerText = `${days} Days to go`;
+                document.getElementById("countdown-timer").innerText = `COUNTDOWN: ${days} DAYS`;
             }, 1000);
         }
-
-        // 音樂
-        const bgmBtn = document.getElementById('bgm-toggle');
-        const bgmAudio = document.getElementById('bgm-audio');
-        const bgmIcon = document.getElementById('bgm-icon');
-        let isPlaying = false;
-        bgmBtn.addEventListener('click', () => {
-            if (isPlaying) { bgmAudio.pause(); bgmIcon.innerText = "🎵"; } 
-            else { bgmAudio.volume = 0.5; bgmAudio.play().catch(e => alert("Click page first")); bgmIcon.innerText = "⏸"; }
-            isPlaying = !isPlaying;
-        });
     </script>
 </body>
 </html>
