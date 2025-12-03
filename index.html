@@ -41,17 +41,37 @@
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); transition: all 0.3s; transform: rotate(-1deg);
         }
         .polaroid-card:hover { transform: rotate(0deg) scale(1.02) translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); z-index: 10; }
-        
-        /* 地圖樣式修復 */
+        .polaroid-card:nth-child(even) { transform: rotate(1deg); }
+        .polaroid-card:nth-child(even):hover { transform: rotate(0deg) scale(1.02) translateY(-5px); }
+
+        /* === 地圖與圖標修正 === */
         #map-container { 
             border: 8px solid white; border-radius: 2rem; 
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); 
             overflow: hidden; transform: rotate(1deg); height: 350px; width: 100%; z-index: 0;
         }
-        /* 讓 OSM 地圖看起來比較溫馨的濾鏡 */
-        .leaflet-tile { filter: sepia(0.2) contrast(0.95) brightness(1.05); }
+        /* 修正 Tailwind 影響 Leaflet 圖片的問題 */
+        .leaflet-tile { filter: sepia(0.2) contrast(0.95) brightness(1.05); max-width: none !important; }
         
-        .custom-pin { background: none; border: none; font-size: 28px; text-shadow: 0 2px 4px rgba(0,0,0,0.3); animation: float 2s ease-in-out infinite; }
+        /* 圖標樣式：確保置中 */
+        .custom-pin { 
+            background: none; border: none; 
+            display: flex !important; 
+            justify-content: center; 
+            align-items: flex-end; /* 讓 Emoji 底部對齊定位點 */
+        }
+        .pin-inner {
+            font-size: 32px; 
+            line-height: 1;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.3); 
+            animation: pin-float 2s ease-in-out infinite;
+            transform-origin: bottom center;
+        }
+        @keyframes pin-float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        
         .sticker { position: absolute; z-index: 20; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1)); }
     </style>
 </head>
@@ -124,6 +144,11 @@
                     <h2 class="text-2xl font-bold text-stone-800 font-display mb-2 group-hover:text-emerald-500 transition-colors">新加坡花園之旅</h2>
                     <p class="text-stone-500 text-sm leading-relaxed font-hand text-lg mb-4 line-clamp-2">環球影城、動物園、濱海灣花園，熱帶親子回憶。</p>
                     <div class="flex justify-between items-center border-t border-stone-100 pt-3">
+                        <div class="flex -space-x-2">
+                            <div class="w-8 h-8 rounded-full bg-blue-100 border-2 border-white flex items-center justify-center text-xs">👨🏻</div>
+                            <div class="w-8 h-8 rounded-full bg-pink-100 border-2 border-white flex items-center justify-center text-xs">👩🏻</div>
+                            <div class="w-8 h-8 rounded-full bg-yellow-100 border-2 border-white flex items-center justify-center text-xs">👧🏻</div>
+                        </div>
                         <span class="text-stone-400 text-xs font-bold uppercase tracking-wider group-hover:text-emerald-500 transition-colors">Log →</span>
                     </div>
                 </div>
@@ -139,6 +164,11 @@
                     <h2 class="text-2xl font-bold text-stone-800 font-display mb-2 group-hover:text-orange-500 transition-colors">福岡採買放風</h2>
                     <p class="text-stone-500 text-sm leading-relaxed font-hand text-lg mb-4 line-clamp-2">拉麵、屋台美食、太宰府參拜，全家吃貨之旅。</p>
                     <div class="flex justify-between items-center border-t border-stone-100 pt-3">
+                        <div class="flex -space-x-2">
+                            <div class="w-8 h-8 rounded-full bg-blue-100 border-2 border-white flex items-center justify-center text-xs">👨🏻</div>
+                            <div class="w-8 h-8 rounded-full bg-pink-100 border-2 border-white flex items-center justify-center text-xs">👩🏻</div>
+                            <div class="w-8 h-8 rounded-full bg-yellow-100 border-2 border-white flex items-center justify-center text-xs">👧🏻</div>
+                        </div>
                         <span class="text-stone-400 text-xs font-bold uppercase tracking-wider group-hover:text-orange-500 transition-colors">Go →</span>
                     </div>
                 </div>
@@ -154,6 +184,11 @@
                     <h2 class="text-2xl font-bold text-stone-800 font-display mb-2 group-hover:text-sky-500 transition-colors">北海道雪國之旅</h2>
                     <p class="text-stone-500 text-sm leading-relaxed font-hand text-lg mb-4 line-clamp-2">要在星野渡假村滑雪，還要帶 Phoebe 去看企鵝散步！</p>
                     <div class="flex justify-between items-center border-t border-stone-100 pt-3">
+                        <div class="flex -space-x-2">
+                            <div class="w-8 h-8 rounded-full bg-blue-100 border-2 border-white flex items-center justify-center text-xs">👨🏻</div>
+                            <div class="w-8 h-8 rounded-full bg-pink-100 border-2 border-white flex items-center justify-center text-xs">👩🏻</div>
+                            <div class="w-8 h-8 rounded-full bg-yellow-100 border-2 border-white flex items-center justify-center text-xs">👧🏻</div>
+                        </div>
                         <span class="text-stone-400 text-xs font-bold uppercase tracking-wider group-hover:text-sky-500 transition-colors">Go →</span>
                     </div>
                 </div>
@@ -179,31 +214,40 @@
         document.addEventListener('DOMContentLoaded', type);
 
         function initRootWeather() {
-            fetch("https://api.open-meteo.com/v1/forecast?latitude=1.3521&longitude=103.8198&current=temperature_2m,weather_code&timezone=Asia%2FSingapore")
+            // 預設顯示新加坡天氣
+            fetch("https://api.open-meteo.com/v1/forecast?latitude=43.06&longitude=141.35&current=temperature_2m,weather_code&timezone=Asia%2FTokyo")
             .then(res => res.json()).then(data => {
                 const temp = Math.round(data.current.temperature_2m);
+                let icon = "☁️"; if (data.current.weather_code === 0) icon = "☀️"; else if (data.current.weather_code >= 71) icon = "❄️";
                 document.getElementById('weather-temp').innerText = temp;
+                document.getElementById('weather-icon').innerText = icon;
+                document.getElementById('weather-loading').style.display = 'none';
                 document.getElementById('weather-display').classList.remove('opacity-0');
             }).catch(console.error);
         }
         initRootWeather();
 
+        // 倒數 (北海道 2026/01/24)
         const targetDate = new Date("2026/01/24 00:00:00").getTime();
         setInterval(() => {
             const now = new Date().getTime();
             const distance = targetDate - now;
-            if (distance < 0) { document.getElementById("hero-countdown").innerText = "Enjoy!"; }
-            else {
-                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                document.getElementById("hero-countdown").innerText = `倒數 ${days} 天`;
-            }
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            document.getElementById("hero-countdown").innerText = `倒數 ${days} 天`;
         }, 1000);
 
-        // 地圖 (改用 OSM)
+        // 地圖 (Leaflet) - 修正定位點
         const map = L.map('map-container', { zoomControl: false, scrollWheelZoom: false, dragging: true, attributionControl: false }).setView([25, 125], 3);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 }).addTo(map);
         
-        const createIcon = (emoji) => L.divIcon({ className: 'custom-pin', html: `<span style="font-size:24px; display:block; animation:float 2s infinite;">${emoji}</span>`, iconSize: [30, 30], iconAnchor: [15, 15] });
+        // 關鍵：iconAnchor 設定為 [20, 40] (圖標寬高的一半, 圖標高度)，讓 Emoji 底部對齊座標
+        const createIcon = (emoji) => L.divIcon({ 
+            className: 'custom-pin', 
+            html: `<span class="pin-inner">${emoji}</span>`, 
+            iconSize: [40, 40], 
+            iconAnchor: [20, 40] 
+        });
+
         const locations = [
             { name: "Taipei", lat: 25.03, lng: 121.56, icon: "🏠" },
             { name: "Singapore", lat: 1.35, lng: 103.82, icon: "🦁" },
