@@ -40,6 +40,12 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; items-center; gap: 0.4rem;
         }
         .nav-btn.active { background: #ea580c; color: white; box-shadow: 0 4px 12px -2px rgba(234, 88, 12, 0.4); }
+
+        .btn-instagram {
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .btn-instagram:hover { filter: brightness(1.1); transform: translateY(-1px); }
     </style>
 </head>
 <body class="text-slate-800 antialiased pb-32">
@@ -87,15 +93,10 @@
     </div>
 
     <div class="max-w-xl mx-auto -mt-6 relative z-20 px-4">
-        
         <div id="sticky-header" class="sticky top-4 z-40 mb-6 transition-all duration-300">
             <div class="glass-header shadow-lg rounded-2xl p-1.5 bg-white/80">
-                
                 <div class="flex overflow-x-auto hide-scrollbar gap-1.5" id="day-tabs"></div>
-
-                <div class="flex overflow-x-auto hide-scrollbar gap-1.5 hidden" id="category-tabs">
-                    </div>
-
+                <div class="flex overflow-x-auto hide-scrollbar gap-1.5 hidden" id="category-tabs"></div>
             </div>
         </div>
 
@@ -111,12 +112,8 @@
     </div>
 
     <div class="nav-bar">
-        <button onclick="switchMode('schedule')" id="btn-schedule" class="nav-btn active">
-            📅 行程表
-        </button>
-        <button onclick="switchMode('list')" id="btn-list" class="nav-btn">
-            📝 備忘錄
-        </button>
+        <button onclick="switchMode('schedule')" id="btn-schedule" class="nav-btn active">📅 行程表</button>
+        <button onclick="switchMode('list')" id="btn-list" class="nav-btn">📝 備忘錄</button>
     </div>
 
     <script>
@@ -165,10 +162,20 @@
                 grandTotal += cost;
                 
                 let mapUrl = row.map_url || (row.title ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(row.title)}` : "");
+                
+                // 【核心更新】自動 IG 連結邏輯
+                let igUrl = row.instagram || "";
+                // 如果沒填 IG，且類型不是交通，且有標題 -> 自動產生 Hashtag 搜尋連結
+                if (!igUrl && row.title && !row.type?.toLowerCase().includes('transport')) {
+                    // 移除括號、空格與特殊符號，確保 Hashtag 有效
+                    const cleanTitle = row.title.replace(/[ .\/\\()（）-]/g, '');
+                    igUrl = `https://www.instagram.com/explore/tags/${encodeURIComponent(cleanTitle)}/`;
+                }
+
                 const item = {
                     time: row.time||"", icon: row.icon||"📍", title: row.title||"", desc: row.desc||"",
                     type: getType(row.type), mapUrl: mapUrl, image: row.image||"", cost: cost,
-                    day: row.day_group
+                    day: row.day_group, igUrl: igUrl
                 };
 
                 if (row.date && row.date.trim() !== "") {
@@ -188,7 +195,6 @@
             renderScheduleMode();
         }
 
-        // --- 模式切換與分類導航 ---
         function switchMode(mode) {
             currentMode = mode;
             document.getElementById('btn-schedule').className = `nav-btn ${mode === 'schedule' ? 'active' : ''}`;
@@ -220,23 +226,20 @@
             const container = document.getElementById('schedule-list');
             const catContainer = document.getElementById('category-tabs');
             container.innerHTML = '';
-            catContainer.innerHTML = ''; // 清空分類按鈕
+            catContainer.innerHTML = ''; 
             
             if (listData.size === 0) {
                 container.innerHTML = `<div class="text-center py-10 text-gray-400">Google Sheet 中沒有「無日期」的清單項目</div>`;
                 return;
             }
 
-            // 1. 生成上方導航按鈕
             listData.forEach((_, category) => {
                 const btn = document.createElement('button');
-                // 簡潔的藥丸按鈕樣式
                 btn.className = "flex-none px-4 py-2 rounded-full text-xs font-bold bg-white text-gray-600 border border-gray-200 hover:bg-orange-50 hover:text-orange-600 hover:border-orange-200 transition-colors shadow-sm";
                 btn.innerText = category;
                 btn.onclick = () => {
                     const section = document.getElementById(`cat-${category}`);
                     if(section) {
-                        // 扣掉 Header 高度，避免標題被遮住
                         const yOffset = -140; 
                         const y = section.getBoundingClientRect().top + window.pageYOffset + yOffset;
                         window.scrollTo({top: y, behavior: 'smooth'});
@@ -245,7 +248,6 @@
                 catContainer.appendChild(btn);
             });
 
-            // 2. 生成內容區塊
             listData.forEach((items, category) => {
                 let badgeColor = "bg-gray-100 text-gray-600";
                 if(category.includes("美食")) badgeColor = "bg-orange-100 text-orange-700";
@@ -254,15 +256,14 @@
                 if(category.includes("神社")) badgeColor = "bg-red-100 text-red-700";
 
                 const section = document.createElement('div');
-                section.id = `cat-${category}`; // 設定錨點 ID
-                section.className = "mb-8 animate-slide-up scroll-mt-32"; // scroll-mt 確保滾動位置正確
+                section.id = `cat-${category}`; 
+                section.className = "mb-8 animate-slide-up scroll-mt-32";
                 section.innerHTML = `
                     <div class="flex items-center gap-2 mb-3 px-1 sticky top-16 z-0 py-2">
                         <span class="px-2 py-1 rounded text-xs font-bold ${badgeColor}">${category}</span>
                         <span class="text-xs text-gray-400 font-mono">${items.length}</span>
                     </div>
-                    <div class="grid grid-cols-2 gap-3">
-                        </div>
+                    <div class="grid grid-cols-2 gap-3"></div>
                 `;
                 
                 const grid = section.querySelector('.grid');
@@ -292,9 +293,20 @@
             const item = document.createElement('div');
             item.className = "flex gap-4 items-stretch group opacity-0 animate-slide-up";
             item.style.animationDelay = `${index * 50}ms`;
+
             let imgHtml = e.image ? `<div class="mt-3 rounded-xl overflow-hidden h-32"><img src="${e.image}" class="w-full h-full object-cover"></div>` : '';
             let costHtml = e.cost > 0 ? `<span class="text-[10px] bg-yellow-100 text-yellow-800 px-1.5 py-0.5 rounded font-bold ml-auto">💰$${e.cost.toLocaleString()}</span>` : '';
             
+            // IG 按鈕
+            let igBtnHtml = "";
+            if (e.igUrl) {
+                igBtnHtml = `
+                    <button onclick="event.stopPropagation(); window.open('${e.igUrl}', '_blank')" class="mt-2 text-xs flex items-center gap-1 btn-instagram px-2 py-1 rounded transition-all ml-auto">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                        Reels
+                    </button>`;
+            }
+
             item.innerHTML = `
                 <div class="flex-none w-[56px] flex flex-col items-center sticky top-28 h-fit">
                     <span class="text-[10px] font-bold text-gray-400 mb-1.5">${e.time.split(' ')[0]}</span>
@@ -308,6 +320,7 @@
                     <h3 class="font-bold text-slate-800 text-[17px] mb-1 group-hover:text-orange-600 transition-colors">${e.title}</h3>
                     <p class="text-slate-500 text-sm leading-relaxed">${e.desc}</p>
                     ${imgHtml}
+                    <div class="flex justify-end">${igBtnHtml}</div>
                 </div>
             `;
             return item;
@@ -315,14 +328,24 @@
 
         function createListCard(e, index) {
             const item = document.createElement('div');
-            item.className = "bg-white rounded-xl p-3 shadow-sm border border-orange-50/50 hover:border-orange-200 transition-all cursor-pointer flex flex-col opacity-0 animate-slide-up h-full";
+            item.className = "bg-white rounded-xl p-3 shadow-sm border border-orange-50/50 hover:border-orange-200 transition-all cursor-pointer flex flex-col opacity-0 animate-slide-up h-full relative";
             item.style.animationDelay = `${index * 30}ms`;
             item.onclick = () => window.open(e.mapUrl, '_blank');
 
             let imgHtml = e.image ? `<div class="mt-2 rounded-lg overflow-hidden h-24 w-full"><img src="${e.image}" class="w-full h-full object-cover"></div>` : '';
             let costHtml = e.cost > 0 ? `<div class="mt-2 text-right"><span class="text-[10px] bg-gray-50 text-gray-600 px-1.5 py-0.5 rounded">💰$${e.cost.toLocaleString()}</span></div>` : '';
+            
+            // IG 按鈕 (清單模式小圓鈕)
+            let igBtnHtml = "";
+            if (e.igUrl) {
+                igBtnHtml = `
+                    <button onclick="event.stopPropagation(); window.open('${e.igUrl}', '_blank')" class="absolute top-2 right-2 btn-instagram p-1.5 rounded-full shadow-md z-10 transform scale-75 hover:scale-90 transition-transform">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                    </button>`;
+            }
 
             item.innerHTML = `
+                ${igBtnHtml}
                 <div class="flex justify-between items-start mb-1">
                     <span class="text-2xl">${e.icon}</span>
                 </div>
@@ -339,21 +362,4 @@
             if(t.includes('trans')) return {bg:'bg-blue-50', text:'text-blue-600', label:'交通'};
             if(t.includes('food')) return {bg:'bg-orange-50', text:'text-orange-600', label:'美食'};
             if(t.includes('stay')) return {bg:'bg-indigo-50', text:'text-indigo-600', label:'住宿'};
-            if(t.includes('shop')) return {bg:'bg-pink-50', text:'text-pink-600', label:'購物'};
-            return {bg:'bg-emerald-50', text:'text-emerald-600', label:'活動'};
-        }
-
-        function startCountdown(dateString) {
-            const targetDate = new Date(dateString).getTime();
-            setInterval(() => {
-                const now = new Date().getTime();
-                const distance = targetDate - now;
-                if (distance < 0) { document.getElementById("countdown-timer").innerText = "Have Fun!"; return; }
-                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                document.getElementById("countdown-timer").innerText = `距離出發 ${days} 天 ${hours} 小時`;
-            }, 1000);
-        }
-    </script>
-</body>
-</html>
+            if(t.includes('shop')) return {bg:'bg-pink-50', text:'text
