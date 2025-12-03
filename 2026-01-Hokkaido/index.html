@@ -15,7 +15,7 @@
                     animation: { 'slide-up': 'slideUp 0.5s ease-out forwards', 'float': 'float 3s ease-in-out infinite' },
                     keyframes: {
                         slideUp: { '0%': { opacity: '0', transform: 'translateY(20px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
-                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } }
+                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-6px)' } }
                     }
                 }
             }
@@ -60,11 +60,19 @@
                     </div>
                 </div>
 
-                <div class="dashboard-card rounded-2xl overflow-hidden h-[100px] relative flex items-center justify-center">
-                    <span class="absolute top-2 left-3 text-[10px] text-sky-900 font-bold uppercase tracking-wider z-10">Sapporo Now</span>
-                    <div class="w-[120%] -ml-2 mt-4 transform scale-90 opacity-95">
-                        <a class="weatherwidget-io" href="https://forecast7.com/en/43d06141d30/sapporo/" data-label_1="" data-label_2="" data-font="Inter" data-icons="Climacons Animated" data-mode="Current" data-theme="pure" data-textcolor="#0c4a6e" >Sapporo</a>
-                        <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src='https://weatherwidget.io/js/widget.min.js';fjs.parentNode.insertBefore(js,fjs);}}(document,'script','weatherwidget-io-js');</script>
+                <div class="dashboard-card rounded-2xl overflow-hidden h-[100px] relative flex flex-col items-center justify-center group">
+                    <span class="absolute top-2 left-3 text-[10px] text-sky-900 font-bold uppercase tracking-wider z-10 opacity-70">Sapporo Now</span>
+                    
+                    <div id="weather-display" class="flex items-center justify-center gap-3 mt-2 transition-all duration-500 opacity-0">
+                        <span id="weather-icon" class="text-4xl filter drop-shadow-sm animate-float">❄️</span>
+                        <div class="text-left">
+                            <div id="weather-temp" class="text-3xl font-black text-sky-900 tracking-tighter leading-none">--°</div>
+                            <div id="weather-desc" class="text-[10px] font-bold text-sky-600 uppercase tracking-wide">Loading</div>
+                        </div>
+                    </div>
+                    
+                    <div id="weather-loading" class="absolute inset-0 flex items-center justify-center">
+                        <div class="w-5 h-5 border-2 border-sky-200 border-t-sky-500 rounded-full animate-spin"></div>
                     </div>
                 </div>
             </div>
@@ -79,22 +87,71 @@
         </div>
         <div class="relative min-h-[400px]" id="schedule-container">
             <div class="timeline-line"></div>
-            <div id="schedule-list" class="space-y-6 relative z-10 pb-10"></div>
+            <div id="schedule-list" class="space-y-6 relative z-10 pb-10">
+                <div class="flex flex-col items-center justify-center py-20 text-gray-400">
+                    <div class="w-10 h-10 border-4 border-sky-200 border-t-sky-500 rounded-full animate-spin mb-4"></div>
+                    <p class="text-sm">正在下載行程...</p>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        // 【請在此處貼上您新的 Hokkaido CSV 連結】
-        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT0VzpYNtRMmLw1A39zZtqT4mRAyUpZynYsd_CxtmqYWzC7kXjs-S6Kam7cEPkU3wcK6SlFO1yYwx-O/pub?gid=1000630113&single=true&output=csv';
+        // 【請在此處貼上您 Hokkaido 的 CSV 連結】
+        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT0VzpYNtRMmLw1A39zZtqT4mRAyUpZynYsd_CxtmqYWzC7kXjs-S6Kam7cEPkU3wcK6SlFO1yYwx-O/pub?gid=976514785&single=true&output=csv';
 
         let currentDayIndex = 0, tripData = [];
 
-        window.onload = function() { fetchData(); };
+        window.onload = function() { 
+            fetchData(); 
+            initWeather(); // 啟動天氣
+        };
+
+        // 新增：天氣初始化函式
+        function initWeather() {
+            // 札幌座標
+            const apiUrl = "https://api.open-meteo.com/v1/forecast?latitude=43.06&longitude=141.35&current=temperature_2m,weather_code&timezone=Asia%2FTokyo";
+            
+            fetch(apiUrl)
+                .then(res => res.json())
+                .then(data => {
+                    const current = data.current;
+                    const code = current.weather_code;
+                    const temp = Math.round(current.temperature_2m);
+                    
+                    // 天氣代碼對照表
+                    let icon = "☁️", desc = "Cloudy";
+                    if (code === 0) { icon = "☀️"; desc = "Sunny"; }
+                    else if (code >= 1 && code <= 3) { icon = "⛅"; desc = "Cloudy"; }
+                    else if (code >= 45 && code <= 48) { icon = "🌫️"; desc = "Foggy"; }
+                    else if (code >= 51 && code <= 67) { icon = "🌧️"; desc = "Rain"; }
+                    else if (code >= 71 && code <= 77) { icon = "❄️"; desc = "Snow"; }
+                    else if (code >= 80 && code <= 82) { icon = "🌦️"; desc = "Showers"; }
+                    else if (code >= 85 && code <= 86) { icon = "🌨️"; desc = "Snow"; }
+                    
+                    document.getElementById('weather-temp').innerText = `${temp}°`;
+                    document.getElementById('weather-icon').innerText = icon;
+                    document.getElementById('weather-desc').innerText = desc;
+                    
+                    document.getElementById('weather-loading').style.display = 'none';
+                    document.getElementById('weather-display').classList.remove('opacity-0');
+                })
+                .catch(err => {
+                    console.error(err);
+                    document.getElementById('weather-desc').innerText = "Offline";
+                    document.getElementById('weather-loading').style.display = 'none';
+                    document.getElementById('weather-display').classList.remove('opacity-0');
+                });
+        }
+
         function fetchData() {
             Papa.parse(SHEET_URL, {
                 download: true, header: true, skipEmptyLines: true,
                 complete: function(results) { processData(results.data); },
-                error: function(err) { console.error(err); }
+                error: function(err) { 
+                    console.error(err);
+                    document.getElementById('schedule-list').innerHTML = '<p class="text-center p-4 text-red-500">讀取資料失敗</p>';
+                }
             });
         }
 
