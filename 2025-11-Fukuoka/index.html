@@ -30,17 +30,17 @@
         
         /* 底部導航樣式 */
         .nav-bar {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px);
-            border-radius: 2rem; padding: 0.5rem; display: flex; gap: 0.5rem;
-            z-index: 100; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.1);
+            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px);
+            border-radius: 9999px; padding: 0.35rem; display: flex; gap: 0.25rem;
+            z-index: 100; box-shadow: 0 10px 30px -5px rgba(0,0,0,0.15);
+            border: 1px solid rgba(0,0,0,0.05);
         }
         .nav-btn {
-            padding: 0.5rem 1.25rem; border-radius: 1.5rem; color: #94a3b8; font-size: 0.875rem; font-weight: 600;
-            transition: all 0.3s; display: flex; items-center; gap: 0.5rem;
+            padding: 0.6rem 1.5rem; border-radius: 9999px; color: #64748b; font-size: 0.9rem; font-weight: 700;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; items-center; gap: 0.4rem;
         }
-        .nav-btn.active { background: white; color: #ea580c; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .nav-btn.active { background: #ea580c; color: white; box-shadow: 0 4px 12px -2px rgba(234, 88, 12, 0.4); }
     </style>
 </head>
 <body class="text-slate-800 antialiased pb-32">
@@ -108,20 +108,18 @@
 
     <div class="nav-bar">
         <button onclick="switchMode('schedule')" id="btn-schedule" class="nav-btn active">
-            📅 行程
+            📅 行程表
         </button>
         <button onclick="switchMode('list')" id="btn-list" class="nav-btn">
-            📝 清單
+            📝 備忘錄
         </button>
     </div>
 
     <script>
-        // CSV 連結 (請確認您的 Sheet 連結是否正確)
         const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT0VzpYNtRMmLw1A39zZtqT4mRAyUpZynYsd_CxtmqYWzC7kXjs-S6Kam7cEPkU3wcK6SlFO1yYwx-O/pub?gid=0&single=true&output=csv';
 
         let currentMode = 'schedule';
         let currentDayIndex = 0;
-        
         let rawData = [];
         let scheduleData = [];
         let listData = new Map();
@@ -129,7 +127,6 @@
         window.onload = function() { fetchData(); initWeather(); };
 
         function initWeather() {
-            // 福岡座標
             const apiUrl = "https://api.open-meteo.com/v1/forecast?latitude=33.59&longitude=130.40&current=temperature_2m,weather_code&timezone=Asia%2FTokyo";
             fetch(apiUrl).then(res => res.json()).then(data => {
                 const code = data.current.weather_code;
@@ -176,7 +173,6 @@
                     if (!scheduleMap.has(dayKey)) scheduleMap.set(dayKey, { day: row.day_group, date: row.date, events: [] });
                     scheduleMap.get(dayKey).events.push(item);
                     
-                    // 倒數計時 (福岡 2025/11/28)
                     if (scheduleMap.size === 1) startCountdown(`2025/${row.date.split(' ')[0]} 00:00:00`);
                 } else {
                     const listKey = row.day_group.trim();
@@ -208,23 +204,45 @@
 
         function renderScheduleMode() {
             renderTabs();
-            if(scheduleData.length > 0) renderEvents(scheduleData[currentDayIndex].events);
+            if(scheduleData.length > 0) renderEvents(scheduleData[currentDayIndex].events, 'schedule');
             else document.getElementById('schedule-list').innerHTML = `<div class="text-center py-10 text-gray-400">目前沒有固定行程</div>`;
         }
 
+        // 重新設計的清單模式渲染函式 (Notion 看板風格)
         function renderListMode() {
             const container = document.getElementById('schedule-list');
             container.innerHTML = '';
+            
             if (listData.size === 0) {
                 container.innerHTML = `<div class="text-center py-10 text-gray-400">Google Sheet 中沒有「無日期」的清單項目</div>`;
                 return;
             }
+
             listData.forEach((items, category) => {
-                const header = document.createElement('div');
-                header.className = "flex items-center gap-2 mt-6 mb-3 px-2";
-                header.innerHTML = `<div class="h-6 w-1 bg-orange-500 rounded-full"></div><h3 class="font-bold text-lg text-slate-700">${category}</h3><span class="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">${items.length}</span>`;
-                container.appendChild(header);
-                items.forEach(e => container.appendChild(createCard(e, false)));
+                // 產生顏色標籤
+                let badgeColor = "bg-gray-100 text-gray-600";
+                if(category.includes("美食")) badgeColor = "bg-orange-100 text-orange-700";
+                if(category.includes("購物") || category.includes("逛街")) badgeColor = "bg-pink-100 text-pink-700";
+                if(category.includes("景點")) badgeColor = "bg-blue-100 text-blue-700";
+                if(category.includes("神社")) badgeColor = "bg-red-100 text-red-700";
+
+                const section = document.createElement('div');
+                section.className = "mb-8 animate-slide-up";
+                section.innerHTML = `
+                    <div class="flex items-center gap-2 mb-3 px-1 sticky top-0 bg-[#fff7ed] z-10 py-2">
+                        <span class="px-2 py-1 rounded text-xs font-bold ${badgeColor}">${category}</span>
+                        <span class="text-xs text-gray-400 font-mono">${items.length}</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        </div>
+                `;
+                
+                const grid = section.querySelector('.grid');
+                items.forEach((e, i) => {
+                    grid.appendChild(createListCard(e, i));
+                });
+                
+                container.appendChild(section);
             });
         }
 
@@ -242,34 +260,54 @@
 
         function renderEvents(events) {
             const c = document.getElementById('schedule-list'); c.innerHTML = '';
-            events.forEach((e, i) => c.appendChild(createCard(e, true, i)));
+            events.forEach((e, i) => c.appendChild(createScheduleCard(e, i)));
         }
 
-        function createCard(e, hasTimeline, index = 0) {
+        // 行程卡片 (有時間軸)
+        function createScheduleCard(e, index) {
             const item = document.createElement('div');
             item.className = "flex gap-4 items-stretch group opacity-0 animate-slide-up";
             item.style.animationDelay = `${index * 50}ms`;
 
             let imgHtml = e.image ? `<div class="mt-3 rounded-xl overflow-hidden h-32"><img src="${e.image}" class="w-full h-full object-cover"></div>` : '';
             let costHtml = e.cost > 0 ? `<span class="text-[10px] bg-yellow-100 text-yellow-800 px-1.5 py-0.5 rounded font-bold ml-auto">💰$${e.cost.toLocaleString()}</span>` : '';
-            let timelineHtml = hasTimeline ? 
-                `<div class="flex-none w-[56px] flex flex-col items-center sticky top-28 h-fit"><span class="text-[10px] font-bold text-gray-400 mb-1.5">${e.time.split(' ')[0]}</span><div class="w-12 h-12 rounded-full bg-white border-2 border-orange-100 shadow-sm flex items-center justify-center text-xl group-hover:scale-110 transition-transform">${e.icon}</div></div>` : 
-                `<div class="flex-none w-[16px] flex flex-col items-center pt-4"><div class="w-2 h-2 rounded-full bg-gray-200"></div></div>`;
-
+            
             item.innerHTML = `
-                ${timelineHtml}
+                <div class="flex-none w-[56px] flex flex-col items-center sticky top-28 h-fit">
+                    <span class="text-[10px] font-bold text-gray-400 mb-1.5">${e.time.split(' ')[0]}</span>
+                    <div class="w-12 h-12 rounded-full bg-white border-2 border-orange-100 shadow-sm flex items-center justify-center text-xl group-hover:scale-110 transition-transform">${e.icon}</div>
+                </div>
                 <div class="flex-1 bg-white rounded-2xl p-4 shadow-sm border border-orange-50 hover:border-orange-200 transition-all cursor-pointer" onclick="window.open('${e.mapUrl}', '_blank')">
                     <div class="flex items-center gap-2 mb-2">
                         <span class="px-2 py-0.5 rounded text-[10px] font-bold ${e.type.bg} ${e.type.text}">${e.type.label}</span>
                         ${costHtml}
                     </div>
-                    <div class="flex justify-between items-start">
-                        <h3 class="font-bold text-slate-800 text-[17px] mb-1 group-hover:text-orange-600 transition-colors">${e.title}</h3>
-                        ${!hasTimeline ? `<span class="text-xl">${e.icon}</span>` : ''} 
-                    </div>
+                    <h3 class="font-bold text-slate-800 text-[17px] mb-1 group-hover:text-orange-600 transition-colors">${e.title}</h3>
                     <p class="text-slate-500 text-sm leading-relaxed">${e.desc}</p>
                     ${imgHtml}
                 </div>
+            `;
+            return item;
+        }
+
+        // 清單卡片 (無時間軸，網格狀)
+        function createListCard(e, index) {
+            const item = document.createElement('div');
+            item.className = "bg-white rounded-xl p-3 shadow-sm border border-orange-50/50 hover:border-orange-200 transition-all cursor-pointer flex flex-col opacity-0 animate-slide-up h-full";
+            item.style.animationDelay = `${index * 30}ms`;
+            item.onclick = () => window.open(e.mapUrl, '_blank');
+
+            let imgHtml = e.image ? `<div class="mt-2 rounded-lg overflow-hidden h-24 w-full"><img src="${e.image}" class="w-full h-full object-cover"></div>` : '';
+            let costHtml = e.cost > 0 ? `<div class="mt-2 text-right"><span class="text-[10px] bg-gray-50 text-gray-600 px-1.5 py-0.5 rounded">💰$${e.cost.toLocaleString()}</span></div>` : '';
+
+            item.innerHTML = `
+                <div class="flex justify-between items-start mb-1">
+                    <span class="text-2xl">${e.icon}</span>
+                </div>
+                <h3 class="font-bold text-slate-800 text-sm leading-snug group-hover:text-orange-600 line-clamp-2">${e.title}</h3>
+                ${e.desc ? `<p class="text-gray-400 text-xs mt-1 line-clamp-1">${e.desc}</p>` : ''}
+                ${imgHtml}
+                ${costHtml}
             `;
             return item;
         }
