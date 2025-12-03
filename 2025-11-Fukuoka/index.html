@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>我的旅行日誌 ✈️</title>
+    <title>福岡採買放風之旅 🍜</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -25,7 +25,6 @@
                     },
                     animation: {
                         'slide-up': 'slideUp 0.5s ease-out forwards',
-                        'bounce-slow': 'bounce 3s infinite',
                     },
                     keyframes: {
                         slideUp: {
@@ -39,20 +38,17 @@
     </script>
 
     <style>
-        /* 自訂細節樣式 */
         body {
             background-color: #f3f4f6;
             -webkit-tap-highlight-color: transparent;
         }
         
-        /* 隱藏 Scrollbar 但保持功能 */
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* 時間軸線條 */
         .timeline-line {
             position: absolute;
-            left: 27px; /* 調整線條位置以對齊圓點 */
+            left: 27px;
             top: 20px;
             bottom: 0;
             width: 2px;
@@ -60,14 +56,12 @@
             z-index: 0;
         }
 
-        /* 毛玻璃特效 header */
         .glass-header {
             background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
         }
 
-        /* 卡片互動效果 */
         .event-card {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -78,9 +72,9 @@
 </head>
 <body class="text-slate-800 antialiased selection:bg-brand-500 selection:text-white pb-20">
 
-    <div class="relative bg-gradient-to-br from-indigo-600 via-blue-600 to-sky-500 text-white pb-8 pt-12 px-6 rounded-b-[2.5rem] shadow-xl overflow-hidden">
+    <div class="relative bg-gradient-to-br from-red-500 via-orange-500 to-yellow-500 text-white pb-8 pt-12 px-6 rounded-b-[2.5rem] shadow-xl overflow-hidden">
         <div class="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 rounded-full bg-white opacity-10 blur-2xl"></div>
-        <div class="absolute bottom-0 left-0 -ml-10 -mb-10 w-40 h-40 rounded-full bg-indigo-900 opacity-20 blur-xl"></div>
+        <div class="absolute bottom-0 left-0 -ml-10 -mb-10 w-40 h-40 rounded-full bg-orange-900 opacity-20 blur-xl"></div>
 
         <a href="../" class="absolute top-5 left-5 p-2 bg-white/20 hover:bg-white/30 backdrop-blur rounded-full transition-all">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -91,7 +85,7 @@
         <div class="relative z-10 text-center mt-4">
             <span class="inline-block py-1 px-3 rounded-full bg-white/20 backdrop-blur-sm text-xs font-medium tracking-wider mb-3 border border-white/10">TRAVEL LOG</span>
             <h1 class="text-3xl font-extrabold tracking-tight mb-2 drop-shadow-md">福岡採買放風之旅</h1>
-            <p class="text-blue-100 text-sm font-light flex justify-center items-center gap-2">
+            <p class="text-orange-50 text-sm font-light flex justify-center items-center gap-2">
                 <span id="date-range">Loading dates...</span>
             </p>
         </div>
@@ -116,7 +110,7 @@
             
             <div id="schedule-list" class="space-y-6 relative z-10 pb-10">
                 <div class="flex flex-col items-center justify-center py-20 text-gray-400">
-                    <div class="w-10 h-10 border-4 border-blue-200 border-t-brand-500 rounded-full animate-spin mb-4"></div>
+                    <div class="w-10 h-10 border-4 border-orange-200 border-t-orange-500 rounded-full animate-spin mb-4"></div>
                     <p class="text-sm">正在從雲端下載行程...</p>
                 </div>
             </div>
@@ -124,12 +118,12 @@
     </div>
 
     <footer class="text-center text-gray-400 text-xs py-6">
-        Designed for Travelers
+        Designed for Rex, Abby & Phoebe
     </footer>
 
     <script>
         // ==========================================
-        //  設定與資料來源
+        //  設定區：請確認這是您的 CSV 連結
         // ==========================================
         const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT0VzpYNtRMmLw1A39zZtqT4mRAyUpZynYsd_CxtmqYWzC7kXjs-S6Kam7cEPkU3wcK6SlFO1yYwx-O/pub?gid=0&single=true&output=csv';
 
@@ -178,7 +172,6 @@
                     });
                 }
                 
-                // 處理類型顏色與標籤
                 const typeInfo = getTypeInfo(row.type);
 
                 grouped.get(dayKey).events.push({
@@ -189,13 +182,15 @@
                     typeKey: row.type || "other",
                     typeLabel: typeInfo.label,
                     typeColor: typeInfo.color,
-                    typeBg: typeInfo.bg
+                    typeBg: typeInfo.bg,
+                    // 【新增】讀取地圖和圖片欄位
+                    mapUrl: row.map_url || "", 
+                    image: row.image || ""
                 });
             });
 
             tripData = Array.from(grouped.values());
             
-            // 更新 header 的日期範圍
             if(tripData.length > 0) {
                 const firstDate = tripData[0].date;
                 const lastDate = tripData[tripData.length-1].date;
@@ -206,17 +201,18 @@
             }
         }
 
-        // 輔助函式：根據 type 回傳顏色樣式
         function getTypeInfo(type) {
             const t = (type || "").toLowerCase();
             if (t.includes('transport') || t.includes('交通') || t.includes('flight')) 
                 return { label: '交通', color: 'text-blue-600', bg: 'bg-blue-50 border-blue-100' };
-            if (t.includes('food') || t.includes('食') || t.includes('餐廳')) 
+            if (t.includes('food') || t.includes('食') || t.includes('餐廳') || t.includes('dinner')) 
                 return { label: '美食', color: 'text-orange-600', bg: 'bg-orange-50 border-orange-100' };
             if (t.includes('stay') || t.includes('住') || t.includes('hotel')) 
                 return { label: '住宿', color: 'text-indigo-600', bg: 'bg-indigo-50 border-indigo-100' };
             if (t.includes('shop') || t.includes('買') || t.includes('購')) 
                 return { label: '購物', color: 'text-pink-600', bg: 'bg-pink-50 border-pink-100' };
+            if (t.includes('神社') || t.includes('temple'))
+                return { label: '文化', color: 'text-red-600', bg: 'bg-red-50 border-red-100' };
             
             return { label: '活動', color: 'text-emerald-600', bg: 'bg-emerald-50 border-emerald-100' };
         }
@@ -229,22 +225,20 @@
                 const btn = document.createElement('button');
                 const isActive = index === currentDayIndex;
                 
-                // 膠囊樣式設計
-                const activeClass = "bg-brand-600 text-white shadow-md transform scale-105";
+                const activeClass = "bg-orange-500 text-white shadow-md transform scale-105"; // 改為橘色系呼應福岡
                 const inactiveClass = "bg-white text-gray-500 hover:bg-gray-50 border border-gray-100";
                 
                 btn.className = `flex-none rounded-xl px-4 py-2 transition-all duration-300 ease-out flex flex-col items-center justify-center min-w-[5rem] ${isActive ? activeClass : inactiveClass}`;
                 
                 btn.innerHTML = `
                     <span class="text-xs font-bold uppercase tracking-wider opacity-90">${day.day}</span>
-                    <span class="text-[10px] ${isActive ? 'text-blue-100' : 'text-gray-400'} mt-0.5">${day.date.split(' ')[0]}</span>
+                    <span class="text-[10px] ${isActive ? 'text-orange-100' : 'text-gray-400'} mt-0.5">${day.date.split(' ')[0]}</span>
                 `;
                 
                 btn.onclick = () => {
                     if (currentDayIndex === index) return;
                     currentDayIndex = index;
                     renderTabs();
-                    // 切換時加上淡出淡入效果
                     const list = document.getElementById('schedule-list');
                     list.style.opacity = '0';
                     list.style.transform = 'translateY(10px)';
@@ -267,23 +261,45 @@
 
             dayEvents.forEach((event, idx) => {
                 const item = document.createElement('div');
-                // 瀑布流動畫延遲 (Staggered Animation)
                 const delay = idx * 100; 
                 
                 item.className = "flex gap-4 items-stretch group opacity-0 animate-slide-up";
                 item.style.animationDelay = `${delay}ms`;
 
+                // 判斷是否有地圖連結
+                const cursorClass = event.mapUrl ? "cursor-pointer hover:text-blue-600" : "";
+                const mapLinkAttr = event.mapUrl ? `onclick="window.open('${event.mapUrl}', '_blank')"` : "";
+
+                // 判斷是否有照片
+                let imageHtml = "";
+                if (event.image) {
+                    imageHtml = `
+                        <div class="mt-3 mb-2 rounded-xl overflow-hidden shadow-sm h-40 relative group-hover:shadow-md transition-all">
+                            <img src="${event.image}" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700" alt="${event.title}">
+                        </div>`;
+                }
+
+                // 導航按鈕
+                let mapBtnHtml = "";
+                if (event.mapUrl) {
+                    mapBtnHtml = `
+                        <button onclick="window.open('${event.mapUrl}', '_blank')" class="mt-3 text-xs flex items-center gap-1 text-blue-500 font-medium hover:bg-blue-50 px-2 py-1 rounded transition-colors ml-auto">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                            Google Maps
+                        </button>`;
+                }
+
                 item.innerHTML = `
                     <div class="flex-none w-[56px] flex flex-col items-center relative">
                         <div class="sticky top-24 flex flex-col items-center">
-                            <span class="text-xs font-bold text-gray-500 font-mono mb-1">${event.time}</span>
+                            <span class="text-xs font-bold text-gray-500 font-mono mb-1">${event.time.split(' ')[0]}</span>
                             <div class="w-14 h-14 rounded-full bg-white border-4 border-gray-50 shadow-sm flex items-center justify-center text-2xl z-10 group-hover:scale-110 transition-transform duration-300">
                                 ${event.icon}
                             </div>
                         </div>
                     </div>
                     
-                    <div class="flex-1 event-card relative bg-white rounded-2xl p-5 shadow-sm border border-gray-100/50 hover:shadow-md cursor-default overflow-hidden">
+                    <div class="flex-1 event-card relative bg-white rounded-2xl p-5 shadow-sm border border-gray-100/50 hover:shadow-md transition-all overflow-hidden flex flex-col">
                         <div class="absolute left-0 top-0 bottom-0 w-1 ${event.typeBg.replace('bg-', 'bg-').split(' ')[0]}"></div>
                         
                         <div class="flex justify-between items-start mb-2">
@@ -292,13 +308,17 @@
                             </div>
                         </div>
                         
-                        <h3 class="font-bold text-gray-800 text-lg mb-1 leading-tight group-hover:text-brand-600 transition-colors">
+                        <h3 class="font-bold text-gray-800 text-lg mb-1 leading-tight transition-colors ${cursorClass}" ${mapLinkAttr}>
                             ${event.title}
                         </h3>
                         
-                        <p class="text-gray-500 text-sm leading-relaxed whitespace-pre-line">
-                            ${event.desc || "沒有詳細描述"}
-                        </p>
+                        <p class="text-gray-500 text-sm leading-relaxed whitespace-pre-line">${event.desc || ""}</p>
+                        
+                        ${imageHtml}
+
+                        <div class="flex items-center mt-auto pt-2">
+                            ${mapBtnHtml}
+                        </div>
                     </div>
                 `;
                 listContainer.appendChild(item);
