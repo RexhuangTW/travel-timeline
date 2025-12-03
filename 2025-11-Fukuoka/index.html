@@ -22,13 +22,12 @@
         }
     </script>
     <style>
-        body { background-color: #fff7ed; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #fff7ed; -webkit-tap-highlight-color: transparent; scroll-behavior: smooth; }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .glass-header { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.6); }
         .dashboard-card { background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.4); box-shadow: 0 8px 32px 0 rgba(135, 38, 38, 0.1); }
         .timeline-line { position: absolute; left: 27px; top: 20px; bottom: 0; width: 2px; background: linear-gradient(to bottom, #fdba74 50%, rgba(255,255,255,0) 100%); z-index: 0; }
         
-        /* 底部導航樣式 */
         .nav-bar {
             position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
             background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px);
@@ -89,9 +88,14 @@
 
     <div class="max-w-xl mx-auto -mt-6 relative z-20 px-4">
         
-        <div id="tabs-container" class="sticky top-4 z-40 mb-6 transition-all duration-300">
+        <div id="sticky-header" class="sticky top-4 z-40 mb-6 transition-all duration-300">
             <div class="glass-header shadow-lg rounded-2xl p-1.5 bg-white/80">
+                
                 <div class="flex overflow-x-auto hide-scrollbar gap-1.5" id="day-tabs"></div>
+
+                <div class="flex overflow-x-auto hide-scrollbar gap-1.5 hidden" id="category-tabs">
+                    </div>
+
             </div>
         </div>
 
@@ -167,12 +171,10 @@
                     day: row.day_group
                 };
 
-                // 分流：有日期=行程，無日期=清單
                 if (row.date && row.date.trim() !== "") {
                     const dayKey = row.day_group.trim();
                     if (!scheduleMap.has(dayKey)) scheduleMap.set(dayKey, { day: row.day_group, date: row.date, events: [] });
                     scheduleMap.get(dayKey).events.push(item);
-                    
                     if (scheduleMap.size === 1) startCountdown(`2025/${row.date.split(' ')[0]} 00:00:00`);
                 } else {
                     const listKey = row.day_group.trim();
@@ -186,40 +188,65 @@
             renderScheduleMode();
         }
 
+        // --- 模式切換與分類導航 ---
         function switchMode(mode) {
             currentMode = mode;
             document.getElementById('btn-schedule').className = `nav-btn ${mode === 'schedule' ? 'active' : ''}`;
             document.getElementById('btn-list').className = `nav-btn ${mode === 'list' ? 'active' : ''}`;
             
+            const dayTabs = document.getElementById('day-tabs');
+            const catTabs = document.getElementById('category-tabs');
+
             if (mode === 'schedule') {
-                document.getElementById('tabs-container').style.display = 'block';
                 document.getElementById('timeline-line').style.opacity = '1';
+                dayTabs.classList.remove('hidden');
+                catTabs.classList.add('hidden');
                 renderScheduleMode();
             } else {
-                document.getElementById('tabs-container').style.display = 'none';
                 document.getElementById('timeline-line').style.opacity = '0';
+                dayTabs.classList.add('hidden');
+                catTabs.classList.remove('hidden');
                 renderListMode();
             }
         }
 
         function renderScheduleMode() {
             renderTabs();
-            if(scheduleData.length > 0) renderEvents(scheduleData[currentDayIndex].events, 'schedule');
+            if(scheduleData.length > 0) renderEvents(scheduleData[currentDayIndex].events);
             else document.getElementById('schedule-list').innerHTML = `<div class="text-center py-10 text-gray-400">目前沒有固定行程</div>`;
         }
 
-        // 重新設計的清單模式渲染函式 (Notion 看板風格)
         function renderListMode() {
             const container = document.getElementById('schedule-list');
+            const catContainer = document.getElementById('category-tabs');
             container.innerHTML = '';
+            catContainer.innerHTML = ''; // 清空分類按鈕
             
             if (listData.size === 0) {
                 container.innerHTML = `<div class="text-center py-10 text-gray-400">Google Sheet 中沒有「無日期」的清單項目</div>`;
                 return;
             }
 
+            // 1. 生成上方導航按鈕
+            listData.forEach((_, category) => {
+                const btn = document.createElement('button');
+                // 簡潔的藥丸按鈕樣式
+                btn.className = "flex-none px-4 py-2 rounded-full text-xs font-bold bg-white text-gray-600 border border-gray-200 hover:bg-orange-50 hover:text-orange-600 hover:border-orange-200 transition-colors shadow-sm";
+                btn.innerText = category;
+                btn.onclick = () => {
+                    const section = document.getElementById(`cat-${category}`);
+                    if(section) {
+                        // 扣掉 Header 高度，避免標題被遮住
+                        const yOffset = -140; 
+                        const y = section.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                        window.scrollTo({top: y, behavior: 'smooth'});
+                    }
+                };
+                catContainer.appendChild(btn);
+            });
+
+            // 2. 生成內容區塊
             listData.forEach((items, category) => {
-                // 產生顏色標籤
                 let badgeColor = "bg-gray-100 text-gray-600";
                 if(category.includes("美食")) badgeColor = "bg-orange-100 text-orange-700";
                 if(category.includes("購物") || category.includes("逛街")) badgeColor = "bg-pink-100 text-pink-700";
@@ -227,9 +254,10 @@
                 if(category.includes("神社")) badgeColor = "bg-red-100 text-red-700";
 
                 const section = document.createElement('div');
-                section.className = "mb-8 animate-slide-up";
+                section.id = `cat-${category}`; // 設定錨點 ID
+                section.className = "mb-8 animate-slide-up scroll-mt-32"; // scroll-mt 確保滾動位置正確
                 section.innerHTML = `
-                    <div class="flex items-center gap-2 mb-3 px-1 sticky top-0 bg-[#fff7ed] z-10 py-2">
+                    <div class="flex items-center gap-2 mb-3 px-1 sticky top-16 z-0 py-2">
                         <span class="px-2 py-1 rounded text-xs font-bold ${badgeColor}">${category}</span>
                         <span class="text-xs text-gray-400 font-mono">${items.length}</span>
                     </div>
@@ -238,10 +266,7 @@
                 `;
                 
                 const grid = section.querySelector('.grid');
-                items.forEach((e, i) => {
-                    grid.appendChild(createListCard(e, i));
-                });
-                
+                items.forEach((e, i) => grid.appendChild(createListCard(e, i)));
                 container.appendChild(section);
             });
         }
@@ -263,12 +288,10 @@
             events.forEach((e, i) => c.appendChild(createScheduleCard(e, i)));
         }
 
-        // 行程卡片 (有時間軸)
         function createScheduleCard(e, index) {
             const item = document.createElement('div');
             item.className = "flex gap-4 items-stretch group opacity-0 animate-slide-up";
             item.style.animationDelay = `${index * 50}ms`;
-
             let imgHtml = e.image ? `<div class="mt-3 rounded-xl overflow-hidden h-32"><img src="${e.image}" class="w-full h-full object-cover"></div>` : '';
             let costHtml = e.cost > 0 ? `<span class="text-[10px] bg-yellow-100 text-yellow-800 px-1.5 py-0.5 rounded font-bold ml-auto">💰$${e.cost.toLocaleString()}</span>` : '';
             
@@ -290,7 +313,6 @@
             return item;
         }
 
-        // 清單卡片 (無時間軸，網格狀)
         function createListCard(e, index) {
             const item = document.createElement('div');
             item.className = "bg-white rounded-xl p-3 shadow-sm border border-orange-50/50 hover:border-orange-200 transition-all cursor-pointer flex flex-col opacity-0 animate-slide-up h-full";
