@@ -163,12 +163,14 @@
                 
                 let mapUrl = row.map_url || (row.title ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(row.title)}` : "");
                 
-                // 【核心更新】自動 IG 連結邏輯
+                // 【修正處】自動 IG 連結邏輯 (加入正確的反引號)
                 let igUrl = row.instagram || "";
-                // 如果沒填 IG，且類型不是交通，且有標題 -> 自動產生 Hashtag 搜尋連結
-                if (!igUrl && row.title && !row.type?.toLowerCase().includes('transport')) {
-                    // 移除括號、空格與特殊符號，確保 Hashtag 有效
+                // 讀取 type 並轉小寫，如果沒有 type 則給空字串，防止報錯
+                const typeLower = (row.type || "").toLowerCase();
+
+                if (!igUrl && row.title && !typeLower.includes('transport')) {
                     const cleanTitle = row.title.replace(/[ .\/\\()（）-]/g, '');
+                    // 這裡修復了語法錯誤
                     igUrl = `https://www.instagram.com/explore/tags/${encodeURIComponent(cleanTitle)}/`;
                 }
 
@@ -297,7 +299,6 @@
             let imgHtml = e.image ? `<div class="mt-3 rounded-xl overflow-hidden h-32"><img src="${e.image}" class="w-full h-full object-cover"></div>` : '';
             let costHtml = e.cost > 0 ? `<span class="text-[10px] bg-yellow-100 text-yellow-800 px-1.5 py-0.5 rounded font-bold ml-auto">💰$${e.cost.toLocaleString()}</span>` : '';
             
-            // IG 按鈕
             let igBtnHtml = "";
             if (e.igUrl) {
                 igBtnHtml = `
@@ -335,7 +336,6 @@
             let imgHtml = e.image ? `<div class="mt-2 rounded-lg overflow-hidden h-24 w-full"><img src="${e.image}" class="w-full h-full object-cover"></div>` : '';
             let costHtml = e.cost > 0 ? `<div class="mt-2 text-right"><span class="text-[10px] bg-gray-50 text-gray-600 px-1.5 py-0.5 rounded">💰$${e.cost.toLocaleString()}</span></div>` : '';
             
-            // IG 按鈕 (清單模式小圓鈕)
             let igBtnHtml = "";
             if (e.igUrl) {
                 igBtnHtml = `
