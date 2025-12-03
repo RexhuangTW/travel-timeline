@@ -4,125 +4,181 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>福岡採買放風之旅 🍜</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Noto+Sans+TC:wght@400;700&family=Patrick+Hand&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: { sans: ['"Plus Jakarta Sans"', '"Noto Sans TC"', 'sans-serif'], mono: ['"Plus Jakarta Sans"', 'monospace'] },
-                    animation: { 'fade-in': 'fadeIn 0.6s ease-out forwards', 'float': 'float 4s ease-in-out infinite' },
+                    fontFamily: {
+                        sans: ['"Noto Sans TC"', 'sans-serif'],
+                        display: ['"Fredoka"', 'sans-serif'],
+                        hand: ['"Patrick Hand"', 'cursive'],
+                    },
+                    colors: {
+                        warm: { 50: '#fff7ed', 100: '#ffedd5', 200: '#fed7aa', 500: '#f97316' },
+                        // 福岡主題色：暖橘紅
+                        fukuoka: { 100: '#ffmVYe', 500: '#ea580c', 600: '#c2410c' } 
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+                        'wiggle': 'wiggle 3s ease-in-out infinite',
+                    },
                     keyframes: {
-                        fadeIn: { '0%': { opacity: '0', transform: 'translateY(10px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
-                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-5px)' } }
+                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } },
+                        fadeInUp: { '0%': { opacity: '0', transform: 'translateY(20px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+                        wiggle: { '0%, 100%': { transform: 'rotate(-3deg)' }, '50%': { transform: 'rotate(3deg)' } }
                     }
                 }
             }
         }
     </script>
+
     <style>
-        body { background-color: #fafafa; -webkit-tap-highlight-color: transparent; scroll-behavior: smooth; }
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        body { background-color: #fffbf0; overflow-x: hidden; } /* 奶油底色 */
         
-        /* 高級毛玻璃 */
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+        /* 背景光暈 (暖色系呼應福岡美食) */
+        .warm-blob { position: absolute; filter: blur(60px); z-index: 0; opacity: 0.4; animation: float 10s ease-in-out infinite; }
+        
+        /* 拍立得卡片 (清單模式) */
+        .polaroid-card {
+            background: white; padding: 10px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+            border: 1px solid #f3f4f6;
+            transition: all 0.3s; 
+        }
+        .polaroid-card:hover { transform: scale(1.02) rotate(1deg); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 10; }
+
+        /* 行程卡片 (時間軸模式) */
+        .journal-card {
+            background: white; border-radius: 1rem;
+            box-shadow: 2px 4px 12px rgba(0,0,0,0.03);
+            border: 1px solid rgba(255,255,255,0.8);
+            position: relative;
+        }
+        /* 紙膠帶裝飾 (橘色) */
+        .washi-tape {
+            position: absolute; top: -10px; left: 50%; transform: translateX(-50%) rotate(-2deg);
+            width: 80px; height: 20px; background-color: rgba(251, 146, 60, 0.3);
+            opacity: 0.8; box-shadow: 0 2px 4px rgba(0,0,0,0.05); z-index: 10;
         }
 
-        /* 瀑布流佈局 */
-        .masonry-grid { column-count: 2; column-gap: 1rem; }
-        .masonry-item { break-inside: avoid; margin-bottom: 1rem; }
-
-        /* 漸層按鈕 */
-        .btn-gradient {
-            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-            box-shadow: 0 4px 12px rgba(234, 88, 12, 0.3);
-        }
+        .sticker { position: absolute; z-index: 20; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1)); }
         
+        /* 底部導航 */
+        .nav-bar {
+            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px);
+            border-radius: 2rem; padding: 0.4rem; display: flex; gap: 0.5rem;
+            z-index: 100; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+        .nav-btn {
+            padding: 0.5rem 1.25rem; border-radius: 1.5rem; color: #94a3b8; font-size: 0.9rem; font-weight: bold; font-family: 'Fredoka';
+            transition: all 0.3s; display: flex; items-center; gap: 0.4rem;
+        }
+        .nav-btn.active { background: #ea580c; color: white; box-shadow: 0 4px 10px rgba(234, 88, 12, 0.3); transform: translateY(-2px); }
+
         /* IG 按鈕 */
         .btn-instagram {
             background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-            color: white; box-shadow: 0 4px 10px rgba(220, 39, 67, 0.2);
+            color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+        }
+        
+        /* 時間軸虛線 */
+        .timeline-line { 
+            position: absolute; left: 24px; top: 20px; bottom: 0; width: 2px; 
+            background: repeating-linear-gradient(to bottom, #fdba74 0, #fdba74 5px, transparent 5px, transparent 10px); 
+            z-index: 0; 
         }
     </style>
 </head>
-<body class="text-slate-800 antialiased pb-36">
+<body class="text-stone-700 antialiased pb-32">
 
-    <div class="relative bg-white pb-6 pt-14 px-6 rounded-b-[2.5rem] shadow-sm z-10 overflow-hidden">
-        <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-orange-50 via-white to-red-50 opacity-80"></div>
-        <div class="absolute -top-20 -right-20 w-64 h-64 bg-orange-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float"></div>
-        <div class="absolute top-20 -left-20 w-64 h-64 bg-red-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float" style="animation-delay: 2s"></div>
+    <div class="fixed inset-0 z-0 pointer-events-none">
+        <div class="warm-blob w-96 h-96 bg-orange-100 rounded-full top-0 left-0 -translate-x-1/2 -translate-y-1/2"></div>
+        <div class="warm-blob w-80 h-80 bg-red-100 rounded-full bottom-0 right-0 translate-x-1/3 translate-y-1/3" style="animation-delay: 2s;"></div>
+    </div>
 
-        <a href="../" class="absolute top-6 left-6 w-10 h-10 flex items-center justify-center bg-white/80 backdrop-blur rounded-full shadow-sm border border-gray-100 z-20 text-slate-600 hover:scale-105 transition-transform">
+    <div class="relative z-10 max-w-lg mx-auto px-6 py-8">
+        
+        <a href="../" class="absolute top-6 left-6 w-10 h-10 bg-white/60 backdrop-blur rounded-full flex items-center justify-center shadow-sm text-stone-500 hover:scale-110 transition-transform z-50">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
         </a>
 
-        <div class="relative z-10 max-w-lg mx-auto text-center">
-            <div class="inline-flex items-center gap-1.5 py-1 px-3 rounded-full bg-orange-100/50 border border-orange-200/50 text-[10px] font-bold tracking-widest uppercase text-orange-700 mb-4">
-                Fukuoka 2025
+        <div class="text-center mt-12 mb-8 relative">
+            <span class="sticker -top-6 -right-2 text-4xl animate-wiggle" style="animation-delay: 1s;">🍜</span>
+            <div class="inline-block bg-orange-100/50 px-4 py-1 rounded-full border border-orange-200 mb-3">
+                <span class="text-xs font-bold text-orange-700 tracking-widest font-display">FUKUOKA 2025</span>
             </div>
-            <h1 class="text-4xl font-black tracking-tight text-slate-900 mb-2 leading-tight">
-                福岡<br><span class="text-orange-600">採買放風</span>之旅
-            </h1>
-            <div id="countdown-timer" class="text-slate-400 text-xs font-medium font-mono tracking-wide mb-6">計算中...</div>
+            <h1 class="text-4xl font-display font-bold text-stone-800 mb-2 tracking-tight">福岡<br><span class="text-orange-500 font-hand text-5xl">採買放風之旅</span></h1>
+            
+            <div id="countdown-timer" class="text-stone-400 text-sm font-hand mt-2 bg-white/50 inline-block px-3 py-1 rounded-lg backdrop-blur-sm border border-white">
+                計算中...
+            </div>
+        </div>
 
-            <div class="grid grid-cols-2 gap-3">
-                <div class="bg-white/60 backdrop-blur p-4 rounded-2xl border border-white shadow-sm flex flex-col justify-center items-start">
-                    <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Estimated Cost</span>
-                    <div class="flex items-baseline gap-1">
-                        <span class="text-xs text-orange-500 font-bold">$</span>
-                        <span id="total-budget" class="text-2xl font-black text-slate-800 tracking-tight">0</span>
-                    </div>
+        <div class="grid grid-cols-2 gap-4 mb-8">
+            <div class="bg-white/70 backdrop-blur rounded-2xl p-4 shadow-sm border border-white relative transform -rotate-1">
+                <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-16 h-4 bg-orange-200/50 rotate-2"></div>
+                <p class="text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-1 font-display">ESTIMATED</p>
+                <div class="flex items-baseline gap-1">
+                    <span class="text-sm font-light opacity-60">$</span>
+                    <span id="total-budget" class="text-2xl font-bold text-stone-700 font-display">0</span>
                 </div>
-                <div class="bg-gradient-to-br from-blue-500 to-blue-600 p-4 rounded-2xl shadow-lg shadow-blue-200 text-white flex flex-col justify-center items-center relative overflow-hidden group">
-                    <span class="absolute top-2 left-3 text-[9px] font-bold opacity-60 uppercase tracking-widest">Fukuoka</span>
-                    <div id="weather-loading" class="absolute inset-0 flex items-center justify-center bg-blue-500"><div class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div></div>
-                    <div id="weather-display" class="flex flex-col items-center opacity-0 transition-opacity duration-500">
-                        <span id="weather-icon" class="text-3xl mb-1 filter drop-shadow-md">☀️</span>
-                        <div class="flex items-baseline">
-                            <span id="weather-temp" class="text-2xl font-bold">--</span>
-                            <span class="text-sm opacity-80 font-light">°C</span>
-                        </div>
+            </div>
+            
+            <div class="bg-white/70 backdrop-blur rounded-2xl p-4 shadow-sm border border-white relative transform rotate-1 flex flex-col items-center justify-center">
+                <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-16 h-4 bg-yellow-200/50 -rotate-2"></div>
+                <div id="weather-loading" class="animate-spin w-5 h-5 border-2 border-stone-200 border-t-orange-400 rounded-full"></div>
+                <div id="weather-display" class="flex flex-col items-center opacity-0 transition-opacity duration-500">
+                    <span id="weather-icon" class="text-3xl mb-1 animate-float">☀️</span>
+                    <div class="flex items-baseline gap-1">
+                        <span id="weather-temp" class="text-2xl font-bold text-stone-700 font-display">--</span>
+                        <span class="text-xs text-stone-400">°C</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="max-w-xl mx-auto px-4 relative z-20 -mt-2">
+    <div class="max-w-xl mx-auto px-4 relative z-20">
         
         <div id="sticky-header" class="sticky top-4 z-30 mb-6 transition-all duration-300">
-            <div class="glass-panel rounded-2xl p-1.5 shadow-sm">
-                <div class="flex overflow-x-auto hide-scrollbar gap-1" id="day-tabs"></div>
-                <div class="flex overflow-x-auto hide-scrollbar gap-1 hidden" id="category-tabs"></div>
+            <div class="bg-white/80 backdrop-blur-md shadow-sm rounded-full p-1.5 border border-white/50">
+                <div class="flex overflow-x-auto hide-scrollbar gap-1.5" id="day-tabs"></div>
+                <div class="flex overflow-x-auto hide-scrollbar gap-1.5 hidden" id="category-tabs"></div>
             </div>
         </div>
 
         <div class="relative min-h-[400px]">
-            <div id="timeline-line" class="absolute left-[27px] top-4 bottom-0 w-[2px] bg-gray-100 z-0"></div>
+            <div id="timeline-line" class="timeline-line transition-opacity duration-300"></div>
             
-            <div id="schedule-list" class="relative z-10">
-                 <div class="flex flex-col items-center justify-center py-20 text-gray-400">
-                    <div class="w-8 h-8 border-2 border-orange-100 border-t-orange-500 rounded-full animate-spin mb-3"></div>
-                    <p class="text-xs">Loading...</p>
+            <div id="schedule-list" class="space-y-6 relative z-10 pb-10">
+                 <div class="flex flex-col items-center justify-center py-20 text-stone-400 font-hand text-xl">
+                    <span class="animate-bounce mb-2">🍜</span>
+                    <p>Loading...</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
-        <div class="glass-panel rounded-full p-1.5 flex gap-1 shadow-xl shadow-orange-100/50">
-            <button onclick="switchMode('schedule')" id="btn-schedule" class="px-5 py-2.5 rounded-full text-xs font-bold transition-all flex items-center gap-2 bg-slate-800 text-white shadow-md">
-                <span>📅</span> 行程
-            </button>
-            <button onclick="switchMode('list')" id="btn-list" class="px-5 py-2.5 rounded-full text-xs font-bold text-slate-500 hover:bg-white transition-all flex items-center gap-2">
-                <span>📝</span> 清單
-            </button>
-        </div>
+    <div class="nav-bar">
+        <button onclick="switchMode('schedule')" id="btn-schedule" class="nav-btn active">📅 行程</button>
+        <button onclick="switchMode('list')" id="btn-list" class="nav-btn">📝 清單</button>
+    </div>
+
+    <div class="fixed bottom-6 right-6 z-50">
+        <button id="bgm-toggle" class="w-12 h-12 bg-white/80 backdrop-blur rounded-full shadow-md border border-white flex items-center justify-center text-xl transition-all hover:scale-110 group">
+            <span id="bgm-icon">🎵</span>
+        </button>
+        <audio id="bgm-audio" loop>
+            <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112191.mp3" type="audio/mpeg">
+        </audio>
     </div>
 
     <script>
@@ -130,19 +186,19 @@
 
         let currentMode = 'schedule';
         let currentDayIndex = 0;
-        let scheduleData = [], listData = new Map();
+        let rawData = [], scheduleData = [], listData = new Map();
 
         window.onload = function() { fetchData(); initWeather(); };
 
+        // 天氣 (福岡)
         function initWeather() {
-            // 福岡座標
-            fetch("https://api.open-meteo.com/v1/forecast?latitude=33.59&longitude=130.40&current=temperature_2m,weather_code&timezone=Asia%2FTokyo")
-            .then(res => res.json()).then(data => {
-                const code = data.current.weather_code;
+            const apiUrl = "https://api.open-meteo.com/v1/forecast?latitude=33.59&longitude=130.40&current=temperature_2m,weather_code&timezone=Asia%2FTokyo";
+            fetch(apiUrl).then(res => res.json()).then(data => {
                 const temp = Math.round(data.current.temperature_2m);
+                const code = data.current.weather_code;
                 let icon = "☁️";
-                if (code === 0) icon = "☀️";
-                else if (code >= 1 && code <= 3) icon = "⛅";
+                if (code === 0) icon = "☀️"; 
+                else if (code >= 1 && code <= 3) icon = "⛅"; 
                 else if (code >= 51) icon = "🌧️";
                 
                 document.getElementById('weather-temp').innerText = temp;
@@ -160,19 +216,19 @@
         }
 
         function processData(data) {
-            const raw = data.filter(row => row.day_group);
-            if (!raw.length) return;
+            rawData = data.filter(row => row.day_group);
+            if (!rawData.length) return;
 
             let grandTotal = 0;
             const scheduleMap = new Map();
 
-            raw.forEach(row => {
+            rawData.forEach(row => {
                 let cost = parseInt((row.cost||"").replace(/[^0-9]/g, '')) || 0; 
                 grandTotal += cost;
                 
                 let mapUrl = row.map_url || (row.title ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(row.title)}` : "");
                 
-                // 自動 IG 連結
+                // IG 連結自動產生
                 let igUrl = row.instagram || "";
                 if (!igUrl && row.title && !(row.type||"").toLowerCase().includes('transport')) {
                     const cleanTitle = row.title.replace(/[ .\/\\()（）-]/g, '');
@@ -189,6 +245,7 @@
                     const dayKey = row.day_group.trim();
                     if (!scheduleMap.has(dayKey)) scheduleMap.set(dayKey, { day: row.day_group, date: row.date, events: [] });
                     scheduleMap.get(dayKey).events.push(item);
+                    // 倒數 2025/11/28
                     if (scheduleMap.size === 1) startCountdown(`2025/${row.date.split(' ')[0]} 00:00:00`);
                 } else {
                     const listKey = row.day_group.trim();
@@ -204,62 +261,59 @@
 
         function switchMode(mode) {
             currentMode = mode;
-            const btnSchedule = document.getElementById('btn-schedule');
-            const btnList = document.getElementById('btn-list');
-            const activeClass = "bg-slate-800 text-white shadow-md";
-            const inactiveClass = "text-slate-500 hover:bg-white";
+            document.getElementById('btn-schedule').className = `nav-btn ${mode === 'schedule' ? 'active' : ''}`;
+            document.getElementById('btn-list').className = `nav-btn ${mode === 'list' ? 'active' : ''}`;
+            
+            const dayTabs = document.getElementById('day-tabs');
+            const catTabs = document.getElementById('category-tabs');
 
             if (mode === 'schedule') {
-                btnSchedule.className = `px-5 py-2.5 rounded-full text-xs font-bold transition-all flex items-center gap-2 ${activeClass}`;
-                btnList.className = `px-5 py-2.5 rounded-full text-xs font-bold transition-all flex items-center gap-2 ${inactiveClass}`;
-                document.getElementById('tabs-container')?.classList.remove('hidden'); // Logic updated
                 document.getElementById('timeline-line').style.opacity = '1';
-                document.getElementById('day-tabs').classList.remove('hidden');
-                document.getElementById('category-tabs').classList.add('hidden');
+                dayTabs.classList.remove('hidden');
+                catTabs.classList.add('hidden');
                 renderScheduleMode();
             } else {
-                btnList.className = `px-5 py-2.5 rounded-full text-xs font-bold transition-all flex items-center gap-2 ${activeClass}`;
-                btnSchedule.className = `px-5 py-2.5 rounded-full text-xs font-bold transition-all flex items-center gap-2 ${inactiveClass}`;
                 document.getElementById('timeline-line').style.opacity = '0';
-                document.getElementById('day-tabs').classList.add('hidden');
-                document.getElementById('category-tabs').classList.remove('hidden');
+                dayTabs.classList.add('hidden');
+                catTabs.classList.remove('hidden');
                 renderListMode();
             }
         }
 
-        // ==================== 1. 行程模式 (Schedule) ====================
+        // 行程模式 (Journal Style)
         function renderScheduleMode() {
             renderTabs();
             const container = document.getElementById('schedule-list');
             container.innerHTML = '';
-            container.className = "space-y-6 pb-24"; // 恢復一般列表間距
+            container.className = "space-y-8 pb-24"; 
 
             if(scheduleData.length > 0) {
                 scheduleData[currentDayIndex].events.forEach((e, i) => {
                     const item = document.createElement('div');
-                    item.className = "flex gap-4 items-stretch group opacity-0 animate-fade-in";
+                    item.className = "flex gap-4 items-start group opacity-0 animate-fade-in";
                     item.style.animationDelay = `${i * 50}ms`;
 
-                    let imgHtml = e.image ? `<div class="mt-3 rounded-xl overflow-hidden h-36 w-full shadow-sm"><img src="${e.image}" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"></div>` : '';
-                    let igBtn = e.igUrl ? `<button onclick="event.stopPropagation(); window.open('${e.igUrl}', '_blank')" class="ml-auto btn-instagram text-[10px] px-2.5 py-1 rounded-full font-bold flex items-center gap-1 transition-transform hover:scale-105"><span>📷</span> Reels</button>` : '';
-                    let costHtml = e.cost > 0 ? `<span class="text-[10px] font-bold text-slate-400">NT$${e.cost.toLocaleString()}</span>` : '';
+                    let imgHtml = e.image ? `<div class="mt-3 rounded-lg overflow-hidden h-36 w-full shadow-inner border border-stone-100 rotate-1"><img src="${e.image}" class="w-full h-full object-cover"></div>` : '';
+                    let igBtn = e.igUrl ? `<button onclick="event.stopPropagation(); window.open('${e.igUrl}', '_blank')" class="ml-auto btn-instagram text-[10px] px-2.5 py-1 rounded-full font-bold flex items-center gap-1 transition-transform hover:scale-105 shadow-sm text-white"><span>📷</span> Reels</button>` : '';
+                    let costHtml = e.cost > 0 ? `<span class="text-[10px] font-bold text-stone-400 font-mono">NT$${e.cost.toLocaleString()}</span>` : '';
 
                     item.innerHTML = `
-                        <div class="flex-none w-[56px] flex flex-col items-center relative z-10">
-                            <div class="sticky top-24 flex flex-col items-center">
-                                <span class="text-[10px] font-bold text-slate-400 mb-1.5 font-mono">${e.time.split(' ')[0]}</span>
-                                <div class="w-10 h-10 rounded-full bg-white border border-gray-100 shadow-sm flex items-center justify-center text-lg z-10 group-hover:scale-110 group-hover:border-orange-200 transition-all duration-300">
-                                    ${e.icon}
-                                </div>
+                        <div class="flex-none w-[50px] flex flex-col items-center relative z-10">
+                            <div class="sticky top-28 flex flex-col items-center">
+                                <span class="text-xs font-hand font-bold text-stone-400 mb-1">${e.time.split(' ')[0]}</span>
+                                <div class="w-10 h-10 rounded-full bg-white border-2 border-dashed border-stone-200 shadow-sm flex items-center justify-center text-lg z-10 group-hover:rotate-12 transition-transform">${e.icon}</div>
                             </div>
                         </div>
-                        <div class="flex-1 bg-white rounded-2xl p-4 border border-gray-100/50 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.03)] hover:shadow-lg hover:border-orange-100 transition-all cursor-pointer relative overflow-hidden" onclick="window.open('${e.mapUrl}', '_blank')">
+                        
+                        <div class="flex-1 journal-card p-4 hover:shadow-md transition-all cursor-pointer" onclick="window.open('${e.mapUrl}', '_blank')">
+                            <div class="washi-tape"></div>
+                            
                             <div class="flex justify-between items-start mb-1">
                                 <span class="px-2 py-0.5 rounded text-[10px] font-bold ${e.type.bg} ${e.type.text}">${e.type.label}</span>
                                 ${costHtml}
                             </div>
-                            <h3 class="font-bold text-slate-800 text-[17px] mb-1 leading-snug group-hover:text-orange-600 transition-colors">${e.title}</h3>
-                            <p class="text-slate-500 text-xs leading-relaxed line-clamp-2">${e.desc}</p>
+                            <h3 class="font-bold text-stone-700 text-lg mb-1 leading-snug group-hover:text-orange-500 transition-colors font-display">${e.title}</h3>
+                            <p class="text-stone-500 text-sm leading-relaxed font-hand">${e.desc}</p>
                             ${imgHtml}
                             <div class="mt-3 flex items-center justify-end">${igBtn}</div>
                         </div>
@@ -267,82 +321,77 @@
                     container.appendChild(item);
                 });
             } else {
-                container.innerHTML = `<div class="text-center py-10 text-gray-400 text-sm">尚無行程</div>`;
+                container.innerHTML = `<div class="text-center py-10 text-stone-400 font-hand">Empty Page...</div>`;
             }
         }
 
-        // ==================== 2. 清單模式 (List - Masonry) ====================
+        // 清單模式 (Masonry Polaroid Style)
         function renderListMode() {
             const container = document.getElementById('schedule-list');
             const catContainer = document.getElementById('category-tabs');
             container.innerHTML = '';
             catContainer.innerHTML = ''; 
-            container.className = "pb-24"; // 移除 space-y，改用內部 margin
+            container.className = "pb-24"; 
 
-            if (listData.size === 0) {
-                container.innerHTML = `<div class="text-center py-10 text-gray-400">無清單資料</div>`;
-                return;
-            }
+            if (listData.size === 0) return;
 
-            // 頂部類別導航
+            // 分類按鈕
             listData.forEach((_, category) => {
                 const btn = document.createElement('button');
-                btn.className = "flex-none px-4 py-2 rounded-full text-xs font-bold bg-white text-gray-500 border border-gray-200 hover:bg-orange-50 hover:text-orange-600 hover:border-orange-200 transition-all";
+                btn.className = "flex-none px-4 py-1.5 rounded-full text-sm font-hand font-bold bg-white text-stone-500 border border-stone-200 hover:bg-orange-50 hover:text-orange-600 transition-all";
                 btn.innerText = category;
                 btn.onclick = () => {
                     const section = document.getElementById(`cat-${category}`);
                     if(section) {
-                        const yOffset = -120; 
-                        const y = section.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                        const y = section.getBoundingClientRect().top + window.pageYOffset - 120;
                         window.scrollTo({top: y, behavior: 'smooth'});
                     }
                 };
                 catContainer.appendChild(btn);
             });
 
-            // 瀑布流內容
+            // 內容
             listData.forEach((items, category) => {
                 const section = document.createElement('div');
                 section.id = `cat-${category}`;
                 section.className = "mb-8 opacity-0 animate-fade-in";
                 
-                // 類別標題
-                let badgeClass = "bg-gray-100 text-gray-600";
+                let badgeClass = "bg-stone-100 text-stone-600";
                 if(category.includes("美食")) badgeClass = "bg-orange-100 text-orange-700";
                 else if(category.includes("購物")) badgeClass = "bg-pink-100 text-pink-700";
-                else if(category.includes("景點")) badgeClass = "bg-blue-100 text-blue-700";
 
                 section.innerHTML = `
-                    <div class="flex items-center gap-2 mb-4 px-1 sticky top-16 z-0 pt-2 pb-1 bg-[#fafafa]/90 backdrop-blur-sm w-full">
-                        <span class="px-3 py-1 rounded-lg text-xs font-bold ${badgeClass}">${category}</span>
-                        <span class="text-xs text-gray-400 font-mono">(${items.length})</span>
+                    <div class="flex items-center gap-2 mb-4 px-1 sticky top-16 z-0 pt-2 pb-1 bg-[#fffbf0]/90 backdrop-blur-sm w-full">
+                        <span class="px-3 py-1 rounded-md text-xs font-bold font-display ${badgeClass}">${category}</span>
+                        <span class="text-xs text-stone-400 font-mono">(${items.length})</span>
                     </div>
-                    <div class="masonry-grid"></div>
+                    <div class="grid grid-cols-2 gap-4"></div>
                 `;
                 
-                const grid = section.querySelector('.masonry-grid');
+                const grid = section.querySelector('.grid');
                 items.forEach((e, i) => {
                     const card = document.createElement('div');
-                    card.className = "masonry-item bg-white rounded-2xl p-3 shadow-sm border border-gray-100 hover:shadow-md transition-all cursor-pointer break-inside-avoid relative overflow-hidden group";
+                    const rotateDeg = (i % 2 === 0) ? '-1deg' : '1deg';
+                    card.className = "polaroid-card cursor-pointer group relative";
+                    card.style.transform = `rotate(${rotateDeg})`;
                     card.onclick = () => window.open(e.mapUrl, '_blank');
 
-                    let imgHtml = e.image ? `<div class="mt-2 rounded-xl overflow-hidden w-full"><img src="${e.image}" class="w-full h-auto object-cover"></div>` : '';
-                    let igBtn = e.igUrl ? `<button onclick="event.stopPropagation(); window.open('${e.igUrl}', '_blank')" class="absolute top-3 right-3 btn-instagram w-6 h-6 rounded-full flex items-center justify-center shadow-md transform scale-90 hover:scale-110 transition-transform text-white text-[10px]">Re</button>` : '';
-                    let costHtml = e.cost > 0 ? `<div class="mt-2 text-right border-t border-dashed border-gray-100 pt-2"><span class="text-[10px] font-bold text-slate-400">NT$${e.cost.toLocaleString()}</span></div>` : '';
-
+                    let imgHtml = e.image ? `<div class="mt-2 h-24 w-full overflow-hidden border border-stone-100"><img src="${e.image}" class="w-full h-full object-cover"></div>` : '';
+                    let igBtn = e.igUrl ? `<button onclick="event.stopPropagation(); window.open('${e.igUrl}', '_blank')" class="absolute top-2 right-2 btn-instagram w-6 h-6 rounded-full flex items-center justify-center shadow-md transform scale-90 hover:scale-110 transition-transform text-white text-[10px]">Re</button>` : '';
+                    
                     card.innerHTML = `
-                        <div class="flex justify-between items-start mb-2">
-                            <div class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-lg">${e.icon}</div>
+                        <div class="flex justify-between items-start mb-1">
+                            <span class="text-xl">${e.icon}</span>
                             ${igBtn}
                         </div>
-                        <h3 class="font-bold text-slate-800 text-sm leading-snug group-hover:text-orange-600 mb-1">${e.title}</h3>
-                        ${e.desc ? `<p class="text-gray-400 text-[10px] leading-relaxed line-clamp-2">${e.desc}</p>` : ''}
+                        <h3 class="font-bold text-stone-700 text-sm leading-snug mb-1 font-display group-hover:text-orange-500">${e.title}</h3>
                         ${imgHtml}
-                        ${costHtml}
+                        <div class="mt-2 text-right border-t border-stone-100 pt-1">
+                            <span class="text-[10px] font-hand font-bold text-stone-400">NT$${e.cost.toLocaleString()}</span>
+                        </div>
                     `;
                     grid.appendChild(card);
                 });
-                
                 container.appendChild(section);
             });
         }
@@ -352,8 +401,8 @@
             scheduleData.forEach((d, i) => {
                 const isActive = i === currentDayIndex;
                 const btn = document.createElement('button');
-                btn.className = `flex-none rounded-xl px-4 py-2 transition-all min-w-[4.5rem] flex flex-col items-center justify-center ${isActive ? 'bg-slate-800 text-white shadow-md transform scale-105' : 'text-slate-400 hover:bg-white hover:text-slate-600'}`;
-                btn.innerHTML = `<span class="text-[10px] font-bold uppercase tracking-wider opacity-80">${d.day}</span><span class="text-sm font-bold">${d.date.split(' ')[0]}</span>`;
+                btn.className = `flex-none rounded-xl px-3 py-2 transition-all min-w-[4rem] flex flex-col items-center justify-center ${isActive ? 'bg-orange-500 text-white shadow-md transform scale-105' : 'text-stone-400 hover:bg-white hover:text-stone-600'}`;
+                btn.innerHTML = `<span class="text-[10px] font-bold uppercase tracking-wider opacity-80 font-display">${d.day}</span><span class="text-xs font-bold font-hand">${d.date.split(' ')[0]}</span>`;
                 btn.onclick = () => { currentDayIndex = i; renderScheduleMode(); };
                 c.appendChild(btn);
             });
@@ -374,9 +423,19 @@
                 const distance = targetDate - now;
                 if (distance < 0) { document.getElementById("countdown-timer").innerText = "Trip Started!"; return; }
                 const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                document.getElementById("countdown-timer").innerText = `COUNTDOWN: ${days} DAYS`;
+                document.getElementById("countdown-timer").innerText = `倒數 ${days} 天`;
             }, 1000);
         }
+
+        const bgmBtn = document.getElementById('bgm-toggle');
+        const bgmAudio = document.getElementById('bgm-audio');
+        const bgmIcon = document.getElementById('bgm-icon');
+        let isPlaying = false;
+        bgmBtn.addEventListener('click', () => {
+            if (isPlaying) { bgmAudio.pause(); bgmIcon.innerText = "🎵"; } 
+            else { bgmAudio.volume = 0.5; bgmAudio.play().catch(e => alert("Click page first")); bgmIcon.innerText = "⏸"; }
+            isPlaying = !isPlaying;
+        });
     </script>
 </body>
 </html>

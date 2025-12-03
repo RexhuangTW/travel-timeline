@@ -4,98 +4,150 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>北海道雪國之旅 ❄️</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Noto+Sans+TC:wght@400;700&family=Patrick+Hand&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: { sans: ['"Inter"', '"Noto Sans TC"', 'sans-serif'], mono: ['"Inter"', 'monospace'] },
-                    animation: { 'slide-up': 'slideUp 0.5s ease-out forwards', 'float': 'float 3s ease-in-out infinite' },
+                    fontFamily: {
+                        sans: ['"Noto Sans TC"', 'sans-serif'],
+                        display: ['"Fredoka"', 'sans-serif'],
+                        hand: ['"Patrick Hand"', 'cursive'],
+                    },
+                    colors: {
+                        warm: { 50: '#fff7ed', 100: '#ffedd5', 200: '#fed7aa', 500: '#f97316' },
+                        ice: { 50: '#f0f9ff', 100: '#e0f2fe', 500: '#0ea5e9', 600: '#0284c7' }
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+                        'wiggle': 'wiggle 3s ease-in-out infinite',
+                    },
                     keyframes: {
-                        slideUp: { '0%': { opacity: '0', transform: 'translateY(20px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
-                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-6px)' } }
+                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } },
+                        fadeInUp: { '0%': { opacity: '0', transform: 'translateY(20px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+                        wiggle: { '0%, 100%': { transform: 'rotate(-3deg)' }, '50%': { transform: 'rotate(3deg)' } }
                     }
                 }
             }
         }
     </script>
+
     <style>
-        body { background-color: #f0f9ff; -webkit-tap-highlight-color: transparent; scroll-behavior: smooth; }
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .glass-header { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.6); }
-        .dashboard-card { background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.4); box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1); }
-        .timeline-line { position: absolute; left: 27px; top: 20px; bottom: 0; width: 2px; background: linear-gradient(to bottom, #bae6fd 50%, rgba(255,255,255,0) 100%); z-index: 0; }
+        body { background-color: #fffbf0; overflow-x: hidden; } /* 奶油底色 */
         
+        /* 背景光暈 (改為冷色調呼應北海道) */
+        .warm-blob { position: absolute; filter: blur(60px); z-index: 0; opacity: 0.4; animation: float 10s ease-in-out infinite; }
+        
+        /* 拍立得卡片 (清單模式) */
+        .polaroid-card {
+            background: white; padding: 10px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+            border: 1px solid #f3f4f6;
+            transition: all 0.3s; 
+        }
+        .polaroid-card:hover { transform: scale(1.02) rotate(1deg); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 10; }
+
+        /* 行程卡片 (時間軸模式) */
+        .journal-card {
+            background: white; border-radius: 1rem;
+            box-shadow: 2px 4px 12px rgba(0,0,0,0.03);
+            border: 1px solid rgba(255,255,255,0.8);
+            position: relative;
+        }
+        /* 紙膠帶裝飾 */
+        .washi-tape {
+            position: absolute; top: -10px; left: 50%; transform: translateX(-50%) rotate(-2deg);
+            width: 80px; height: 20px; background-color: rgba(14, 165, 233, 0.2);
+            opacity: 0.7; box-shadow: 0 2px 4px rgba(0,0,0,0.05); z-index: 10;
+        }
+
+        .sticker { position: absolute; z-index: 20; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1)); }
+        
+        /* 底部導航 */
         .nav-bar {
             position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px);
-            border-radius: 9999px; padding: 0.35rem; display: flex; gap: 0.25rem;
-            z-index: 100; box-shadow: 0 10px 30px -5px rgba(0,0,0,0.15);
-            border: 1px solid rgba(0,0,0,0.05);
+            background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px);
+            border-radius: 2rem; padding: 0.4rem; display: flex; gap: 0.5rem;
+            z-index: 100; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.5);
         }
         .nav-btn {
-            padding: 0.6rem 1.5rem; border-radius: 9999px; color: #64748b; font-size: 0.9rem; font-weight: 700;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; items-center; gap: 0.4rem;
+            padding: 0.5rem 1.25rem; border-radius: 1.5rem; color: #94a3b8; font-size: 0.9rem; font-weight: bold; font-family: 'Fredoka';
+            transition: all 0.3s; display: flex; items-center; gap: 0.4rem;
         }
-        .nav-btn.active { background: #0ea5e9; color: white; box-shadow: 0 4px 12px -2px rgba(14, 165, 233, 0.4); }
+        .nav-btn.active { background: #0ea5e9; color: white; box-shadow: 0 4px 10px rgba(14, 165, 233, 0.3); transform: translateY(-2px); }
 
-        /* IG 按鈕漸層 */
+        /* IG 按鈕 */
         .btn-instagram {
             background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-            color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.15);
         }
-        .btn-instagram:hover { filter: brightness(1.1); transform: translateY(-1px); }
+        
+        .timeline-line { 
+            position: absolute; left: 24px; top: 20px; bottom: 0; width: 2px; 
+            background: repeating-linear-gradient(to bottom, #bae6fd 0, #bae6fd 5px, transparent 5px, transparent 10px); /* 虛線 */
+            z-index: 0; 
+        }
     </style>
 </head>
-<body class="text-slate-800 antialiased pb-32">
+<body class="text-stone-700 antialiased pb-32">
 
-    <div class="relative bg-gradient-to-br from-sky-400 via-blue-500 to-indigo-500 text-white pb-8 pt-12 px-6 rounded-b-[3rem] shadow-2xl overflow-hidden">
-        <div class="absolute top-10 right-10 text-6xl opacity-20 animate-float">❄️</div>
-        <div class="absolute bottom-10 left-0 text-8xl opacity-10 animate-float" style="animation-delay: 1.5s;">☃️</div>
+    <div class="fixed inset-0 z-0 pointer-events-none">
+        <div class="warm-blob w-96 h-96 bg-sky-200 rounded-full top-0 left-0 -translate-x-1/2 -translate-y-1/2"></div>
+        <div class="warm-blob w-80 h-80 bg-indigo-100 rounded-full bottom-0 right-0 translate-x-1/3 translate-y-1/3" style="animation-delay: 2s;"></div>
+    </div>
+
+    <div class="relative z-10 max-w-lg mx-auto px-6 py-8">
         
-        <a href="../" class="absolute top-6 left-6 p-2.5 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-full transition-all z-20 shadow-sm border border-white/20">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+        <a href="../" class="absolute top-6 left-6 w-10 h-10 bg-white/60 backdrop-blur rounded-full flex items-center justify-center shadow-sm text-stone-500 hover:scale-110 transition-transform z-50">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
         </a>
 
-        <div class="relative z-10 max-w-lg mx-auto">
-            <div class="text-center mt-2 mb-6">
-                <span class="inline-flex items-center gap-1.5 py-1 px-3 rounded-full bg-sky-900/30 backdrop-blur-md text-[10px] font-bold tracking-widest uppercase border border-white/20 shadow-sm">
-                    <span class="w-1.5 h-1.5 rounded-full bg-cyan-300 animate-pulse"></span> Winter 2026
-                </span>
-                <h1 class="text-3xl font-black tracking-tight mt-3 mb-1 drop-shadow-lg">北海道雪國之旅</h1>
-                <div id="countdown-timer" class="text-sky-100 text-sm font-medium opacity-90 mt-2 font-mono bg-white/10 inline-block px-3 py-1 rounded-lg backdrop-blur-sm border border-white/10">計算中...</div>
+        <div class="text-center mt-12 mb-8 relative">
+            <span class="sticker -top-6 -right-2 text-4xl animate-wiggle" style="animation-delay: 1s;">☃️</span>
+            <div class="inline-block bg-sky-100/50 px-4 py-1 rounded-full border border-sky-200 mb-3">
+                <span class="text-xs font-bold text-sky-700 tracking-widest font-display">WINTER 2026</span>
             </div>
+            <h1 class="text-4xl font-display font-bold text-stone-800 mb-2 tracking-tight">北海道<br><span class="text-sky-500 font-hand text-5xl">雪國之旅</span></h1>
+            
+            <div id="countdown-timer" class="text-stone-400 text-sm font-hand mt-2 bg-white/50 inline-block px-3 py-1 rounded-lg backdrop-blur-sm border border-white">
+                計算中...
+            </div>
+        </div>
 
-            <div class="grid grid-cols-2 gap-3">
-                <div class="dashboard-card rounded-2xl p-4 flex flex-col justify-between h-[100px] relative overflow-hidden group">
-                    <div class="absolute -right-4 -top-4 text-6xl opacity-20 rotate-12 group-hover:scale-110 transition-transform">💴</div>
-                    <div>
-                        <p class="text-[10px] text-sky-900 font-bold uppercase tracking-wider mb-1">Total Cost</p>
-                        <div class="flex items-baseline gap-1">
-                            <span class="text-sm font-light opacity-80">$</span>
-                            <span id="total-budget" class="text-2xl font-bold font-mono tracking-tighter text-sky-900">0</span>
-                        </div>
-                    </div>
+        <div class="grid grid-cols-2 gap-4 mb-8">
+            <div class="bg-white/70 backdrop-blur rounded-2xl p-4 shadow-sm border border-white relative transform -rotate-1">
+                <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-16 h-4 bg-yellow-200/50 rotate-2"></div>
+                <p class="text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-1 font-display">ESTIMATED</p>
+                <div class="flex items-baseline gap-1">
+                    <span class="text-sm font-light opacity-60">$</span>
+                    <span id="total-budget" class="text-2xl font-bold text-stone-700 font-display">0</span>
                 </div>
-                <div class="dashboard-card rounded-2xl overflow-hidden h-[100px] relative flex flex-col items-center justify-center group">
-                    <span class="absolute top-2 left-3 text-[10px] text-sky-900 font-bold uppercase tracking-wider z-10 opacity-70">Sapporo Now</span>
-                    <div id="weather-display" class="flex items-center justify-center gap-3 mt-2 transition-all duration-500 opacity-0">
-                        <span id="weather-icon" class="text-4xl filter drop-shadow-sm animate-float">❄️</span>
-                        <div class="text-left">
-                            <div id="weather-temp" class="text-3xl font-black text-sky-900 tracking-tighter leading-none">--°</div>
-                            <div id="weather-desc" class="text-[10px] font-bold text-sky-600 uppercase tracking-wide">Loading</div>
-                        </div>
+            </div>
+            
+            <div class="bg-white/70 backdrop-blur rounded-2xl p-4 shadow-sm border border-white relative transform rotate-1 flex flex-col items-center justify-center">
+                <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-16 h-4 bg-sky-200/50 -rotate-2"></div>
+                <div id="weather-loading" class="animate-spin w-5 h-5 border-2 border-stone-200 border-t-sky-400 rounded-full"></div>
+                <div id="weather-display" class="flex flex-col items-center opacity-0 transition-opacity duration-500">
+                    <span id="weather-icon" class="text-3xl mb-1 animate-float">❄️</span>
+                    <div class="flex items-baseline gap-1">
+                        <span id="weather-temp" class="text-2xl font-bold text-stone-700 font-display">--</span>
+                        <span class="text-xs text-stone-400">°C</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="max-w-xl mx-auto -mt-6 relative z-20 px-4">
-        <div id="sticky-header" class="sticky top-4 z-40 mb-6 transition-all duration-300">
-            <div class="glass-header shadow-lg rounded-2xl p-1.5 bg-white/80">
+    <div class="max-w-xl mx-auto px-4 relative z-20">
+        
+        <div id="sticky-header" class="sticky top-4 z-30 mb-6 transition-all duration-300">
+            <div class="bg-white/80 backdrop-blur-md shadow-sm rounded-full p-1.5 border border-white/50">
                 <div class="flex overflow-x-auto hide-scrollbar gap-1.5" id="day-tabs"></div>
                 <div class="flex overflow-x-auto hide-scrollbar gap-1.5 hidden" id="category-tabs"></div>
             </div>
@@ -103,47 +155,53 @@
 
         <div class="relative min-h-[400px]">
             <div id="timeline-line" class="timeline-line transition-opacity duration-300"></div>
-            <div id="schedule-list" class="space-y-4 relative z-10 pb-10">
-                 <div class="flex flex-col items-center justify-center py-20 text-gray-400">
-                    <div class="w-10 h-10 border-4 border-sky-200 border-t-sky-500 rounded-full animate-spin mb-4"></div>
-                    <p class="text-sm">正在載入...</p>
+            
+            <div id="schedule-list" class="space-y-6 relative z-10 pb-10">
+                 <div class="flex flex-col items-center justify-center py-20 text-stone-400 font-hand text-xl">
+                    <span class="animate-bounce mb-2">❄️</span>
+                    <p>Loading Trip...</p>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="nav-bar">
-        <button onclick="switchMode('schedule')" id="btn-schedule" class="nav-btn active">📅 行程表</button>
-        <button onclick="switchMode('list')" id="btn-list" class="nav-btn">📝 備忘錄</button>
+        <button onclick="switchMode('schedule')" id="btn-schedule" class="nav-btn active">📅 行程</button>
+        <button onclick="switchMode('list')" id="btn-list" class="nav-btn">📝 清單</button>
+    </div>
+
+    <div class="fixed bottom-6 right-6 z-50">
+        <button id="bgm-toggle" class="w-12 h-12 bg-white/80 backdrop-blur rounded-full shadow-md border border-white flex items-center justify-center text-xl transition-all hover:scale-110 group">
+            <span id="bgm-icon">🎵</span>
+        </button>
+        <audio id="bgm-audio" loop>
+            <source src="https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3?filename=winter-magic-15389.mp3" type="audio/mpeg">
+        </audio>
     </div>
 
     <script>
-        // 北海道 CSV 連結
         const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT0VzpYNtRMmLw1A39zZtqT4mRAyUpZynYsd_CxtmqYWzC7kXjs-S6Kam7cEPkU3wcK6SlFO1yYwx-O/pub?gid=1000630113&single=true&output=csv';
 
         let currentMode = 'schedule';
         let currentDayIndex = 0;
-        let rawData = [];
-        let scheduleData = [];
-        let listData = new Map();
+        let rawData = [], scheduleData = [], listData = new Map();
 
         window.onload = function() { fetchData(); initWeather(); };
 
+        // 天氣 (札幌)
         function initWeather() {
-            // 札幌座標
             const apiUrl = "https://api.open-meteo.com/v1/forecast?latitude=43.06&longitude=141.35&current=temperature_2m,weather_code&timezone=Asia%2FTokyo";
             fetch(apiUrl).then(res => res.json()).then(data => {
-                const code = data.current.weather_code;
                 const temp = Math.round(data.current.temperature_2m);
-                let icon = "☁️", desc = "Cloudy";
-                if (code === 0) { icon = "☀️"; desc = "Sunny"; }
-                else if (code >= 1 && code <= 3) { icon = "⛅"; desc = "Cloudy"; }
-                else if (code >= 51 && code <= 67) { icon = "🌧️"; desc = "Rain"; }
-                else if (code >= 71 && code <= 77) { icon = "❄️"; desc = "Snow"; }
-                else if (code >= 85 && code <= 86) { icon = "🌨️"; desc = "Heavy Snow"; }
-                document.getElementById('weather-temp').innerText = `${temp}°`;
+                const code = data.current.weather_code;
+                let icon = "☁️";
+                if (code === 0) icon = "☀️"; 
+                else if (code >= 71) icon = "❄️"; 
+                else if (code >= 51) icon = "🌧️";
+                
+                document.getElementById('weather-temp').innerText = temp;
                 document.getElementById('weather-icon').innerText = icon;
-                document.getElementById('weather-desc').innerText = desc;
+                document.getElementById('weather-loading').style.display = 'none';
                 document.getElementById('weather-display').classList.remove('opacity-0');
             }).catch(console.error);
         }
@@ -168,10 +226,9 @@
                 
                 let mapUrl = row.map_url || (row.title ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(row.title)}` : "");
                 
-                // 自動 IG 連結 (排除交通類型)
+                // IG
                 let igUrl = row.instagram || "";
-                const typeLower = (row.type || "").toLowerCase();
-                if (!igUrl && row.title && !typeLower.includes('transport')) {
+                if (!igUrl && row.title && !(row.type||"").toLowerCase().includes('transport')) {
                     const cleanTitle = row.title.replace(/[ .\/\\()（）-]/g, '');
                     igUrl = `https://www.instagram.com/explore/tags/${encodeURIComponent(cleanTitle)}/`;
                 }
@@ -186,7 +243,6 @@
                     const dayKey = row.day_group.trim();
                     if (!scheduleMap.has(dayKey)) scheduleMap.set(dayKey, { day: row.day_group, date: row.date, events: [] });
                     scheduleMap.get(dayKey).events.push(item);
-                    // 倒數計時：設定為第一天日期，年份 2026
                     if (scheduleMap.size === 1) startCountdown(`2026/${row.date.split(' ')[0]} 00:00:00`);
                 } else {
                     const listKey = row.day_group.trim();
@@ -221,58 +277,119 @@
             }
         }
 
+        // 行程模式 (Journal Style)
         function renderScheduleMode() {
             renderTabs();
-            if(scheduleData.length > 0) renderEvents(scheduleData[currentDayIndex].events);
-            else document.getElementById('schedule-list').innerHTML = `<div class="text-center py-10 text-gray-400">目前沒有固定行程</div>`;
+            const container = document.getElementById('schedule-list');
+            container.innerHTML = '';
+            container.className = "space-y-8 pb-24"; // 加大間距
+
+            if(scheduleData.length > 0) {
+                scheduleData[currentDayIndex].events.forEach((e, i) => {
+                    const item = document.createElement('div');
+                    item.className = "flex gap-4 items-start group opacity-0 animate-fade-in";
+                    item.style.animationDelay = `${i * 50}ms`;
+
+                    let imgHtml = e.image ? `<div class="mt-3 rounded-lg overflow-hidden h-36 w-full shadow-inner border border-stone-100 rotate-1"><img src="${e.image}" class="w-full h-full object-cover"></div>` : '';
+                    let igBtn = e.igUrl ? `<button onclick="event.stopPropagation(); window.open('${e.igUrl}', '_blank')" class="ml-auto btn-instagram text-[10px] px-2.5 py-1 rounded-full font-bold flex items-center gap-1 transition-transform hover:scale-105 shadow-sm text-white"><span>📷</span> Reels</button>` : '';
+                    let costHtml = e.cost > 0 ? `<span class="text-[10px] font-bold text-stone-400 font-mono">NT$${e.cost.toLocaleString()}</span>` : '';
+
+                    item.innerHTML = `
+                        <div class="flex-none w-[50px] flex flex-col items-center relative z-10">
+                            <div class="sticky top-28 flex flex-col items-center">
+                                <span class="text-xs font-hand font-bold text-stone-400 mb-1">${e.time.split(' ')[0]}</span>
+                                <div class="w-10 h-10 rounded-full bg-white border-2 border-dashed border-stone-200 shadow-sm flex items-center justify-center text-lg z-10 group-hover:rotate-12 transition-transform">${e.icon}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex-1 journal-card p-4 hover:shadow-md transition-all cursor-pointer" onclick="window.open('${e.mapUrl}', '_blank')">
+                            <div class="washi-tape"></div>
+                            
+                            <div class="flex justify-between items-start mb-1">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold ${e.type.bg} ${e.type.text}">${e.type.label}</span>
+                                ${costHtml}
+                            </div>
+                            <h3 class="font-bold text-stone-700 text-lg mb-1 leading-snug group-hover:text-sky-600 transition-colors font-display">${e.title}</h3>
+                            <p class="text-stone-500 text-sm leading-relaxed font-hand">${e.desc}</p>
+                            ${imgHtml}
+                            <div class="mt-3 flex items-center justify-end">${igBtn}</div>
+                        </div>
+                    `;
+                    container.appendChild(item);
+                });
+            } else {
+                container.innerHTML = `<div class="text-center py-10 text-stone-400 font-hand">Empty Page...</div>`;
+            }
         }
 
+        // 清單模式 (Masonry Polaroid Style)
         function renderListMode() {
             const container = document.getElementById('schedule-list');
             const catContainer = document.getElementById('category-tabs');
             container.innerHTML = '';
             catContainer.innerHTML = ''; 
-            
-            if (listData.size === 0) {
-                container.innerHTML = `<div class="text-center py-10 text-gray-400">Google Sheet 中沒有「無日期」的清單項目</div>`;
-                return;
-            }
+            container.className = "pb-24"; 
 
+            if (listData.size === 0) return;
+
+            // 分類按鈕
             listData.forEach((_, category) => {
                 const btn = document.createElement('button');
-                btn.className = "flex-none px-4 py-2 rounded-full text-xs font-bold bg-white text-gray-600 border border-gray-200 hover:bg-sky-50 hover:text-sky-600 hover:border-sky-200 transition-colors shadow-sm";
+                btn.className = "flex-none px-4 py-1.5 rounded-full text-sm font-hand font-bold bg-white text-stone-500 border border-stone-200 hover:bg-sky-50 hover:text-sky-600 transition-all";
                 btn.innerText = category;
                 btn.onclick = () => {
                     const section = document.getElementById(`cat-${category}`);
                     if(section) {
-                        const yOffset = -140; 
-                        const y = section.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                        const y = section.getBoundingClientRect().top + window.pageYOffset - 120;
                         window.scrollTo({top: y, behavior: 'smooth'});
                     }
                 };
                 catContainer.appendChild(btn);
             });
 
+            // 瀑布流內容
             listData.forEach((items, category) => {
-                let badgeColor = "bg-gray-100 text-gray-600";
-                if(category.includes("美食")) badgeColor = "bg-orange-100 text-orange-700";
-                if(category.includes("購物") || category.includes("逛街")) badgeColor = "bg-pink-100 text-pink-700";
-                if(category.includes("景點")) badgeColor = "bg-blue-100 text-blue-700";
-                if(category.includes("滑雪")) badgeColor = "bg-cyan-100 text-cyan-700";
-
                 const section = document.createElement('div');
-                section.id = `cat-${category}`; 
-                section.className = "mb-8 animate-slide-up scroll-mt-32";
+                section.id = `cat-${category}`;
+                section.className = "mb-8 opacity-0 animate-fade-in";
+                
+                let badgeClass = "bg-stone-100 text-stone-600";
+                if(category.includes("美食")) badgeClass = "bg-orange-100 text-orange-700";
+                else if(category.includes("景點")) badgeClass = "bg-sky-100 text-sky-700";
+
                 section.innerHTML = `
-                    <div class="flex items-center gap-2 mb-3 px-1 sticky top-16 z-0 py-2">
-                        <span class="px-2 py-1 rounded text-xs font-bold ${badgeColor}">${category}</span>
-                        <span class="text-xs text-gray-400 font-mono">${items.length}</span>
+                    <div class="flex items-center gap-2 mb-4 px-1 sticky top-16 z-0 pt-2 pb-1 bg-[#fffbf0]/90 backdrop-blur-sm w-full">
+                        <span class="px-3 py-1 rounded-md text-xs font-bold font-display ${badgeClass}">${category}</span>
+                        <span class="text-xs text-stone-400 font-mono">(${items.length})</span>
                     </div>
-                    <div class="grid grid-cols-2 gap-3"></div>
+                    <div class="grid grid-cols-2 gap-4"></div>
                 `;
                 
                 const grid = section.querySelector('.grid');
-                items.forEach((e, i) => grid.appendChild(createListCard(e, i)));
+                items.forEach((e, i) => {
+                    const card = document.createElement('div');
+                    // 拍立得樣式：隨機微幅旋轉
+                    const rotateDeg = (i % 2 === 0) ? '-1deg' : '1deg';
+                    card.className = "polaroid-card cursor-pointer group relative";
+                    card.style.transform = `rotate(${rotateDeg})`;
+                    card.onclick = () => window.open(e.mapUrl, '_blank');
+
+                    let imgHtml = e.image ? `<div class="mt-2 h-24 w-full overflow-hidden border border-stone-100"><img src="${e.image}" class="w-full h-full object-cover"></div>` : '';
+                    let igBtn = e.igUrl ? `<button onclick="event.stopPropagation(); window.open('${e.igUrl}', '_blank')" class="absolute top-2 right-2 btn-instagram w-6 h-6 rounded-full flex items-center justify-center shadow-md transform scale-90 hover:scale-110 transition-transform text-white text-[10px]">Re</button>` : '';
+                    
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start mb-1">
+                            <span class="text-xl">${e.icon}</span>
+                            ${igBtn}
+                        </div>
+                        <h3 class="font-bold text-stone-700 text-sm leading-snug mb-1 font-display group-hover:text-sky-600">${e.title}</h3>
+                        ${imgHtml}
+                        <div class="mt-2 text-right border-t border-stone-100 pt-1">
+                            <span class="text-[10px] font-hand font-bold text-stone-400">NT$${e.cost.toLocaleString()}</span>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
                 container.appendChild(section);
             });
         }
@@ -282,82 +399,11 @@
             scheduleData.forEach((d, i) => {
                 const isActive = i === currentDayIndex;
                 const btn = document.createElement('button');
-                btn.className = `flex-none rounded-xl px-4 py-2.5 transition-all min-w-[5rem] ${isActive ? 'bg-sky-500 text-white shadow-md' : 'text-gray-500 hover:bg-white/50'}`;
-                btn.innerHTML = `<span class="text-xs font-bold block">${d.day}</span><span class="text-[10px] block opacity-80">${d.date.split(' ')[0]}</span>`;
+                btn.className = `flex-none rounded-xl px-3 py-2 transition-all min-w-[4rem] flex flex-col items-center justify-center ${isActive ? 'bg-sky-500 text-white shadow-md transform scale-105' : 'text-stone-400 hover:bg-white hover:text-stone-600'}`;
+                btn.innerHTML = `<span class="text-[10px] font-bold uppercase tracking-wider opacity-80 font-display">${d.day}</span><span class="text-xs font-bold font-hand">${d.date.split(' ')[0]}</span>`;
                 btn.onclick = () => { currentDayIndex = i; renderScheduleMode(); };
                 c.appendChild(btn);
             });
-        }
-
-        function renderEvents(events) {
-            const c = document.getElementById('schedule-list'); c.innerHTML = '';
-            events.forEach((e, i) => c.appendChild(createScheduleCard(e, i)));
-        }
-
-        function createScheduleCard(e, index) {
-            const item = document.createElement('div');
-            item.className = "flex gap-4 items-stretch group opacity-0 animate-slide-up";
-            item.style.animationDelay = `${index * 50}ms`;
-
-            let imgHtml = e.image ? `<div class="mt-3 rounded-xl overflow-hidden h-32"><img src="${e.image}" class="w-full h-full object-cover"></div>` : '';
-            let costHtml = e.cost > 0 ? `<span class="text-[10px] bg-yellow-100 text-yellow-800 px-1.5 py-0.5 rounded font-bold ml-auto">💰$${e.cost.toLocaleString()}</span>` : '';
-            
-            let igBtnHtml = "";
-            if (e.igUrl) {
-                igBtnHtml = `
-                    <button onclick="event.stopPropagation(); window.open('${e.igUrl}', '_blank')" class="mt-2 text-xs flex items-center gap-1 btn-instagram px-2 py-1 rounded transition-all ml-auto">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-                        Reels
-                    </button>`;
-            }
-
-            item.innerHTML = `
-                <div class="flex-none w-[56px] flex flex-col items-center sticky top-28 h-fit">
-                    <span class="text-[10px] font-bold text-gray-400 mb-1.5">${e.time.split(' ')[0]}</span>
-                    <div class="w-12 h-12 rounded-full bg-white border-2 border-sky-100 shadow-sm flex items-center justify-center text-xl group-hover:scale-110 transition-transform">${e.icon}</div>
-                </div>
-                <div class="flex-1 bg-white rounded-2xl p-4 shadow-sm border border-sky-50 hover:border-sky-200 transition-all cursor-pointer" onclick="window.open('${e.mapUrl}', '_blank')">
-                    <div class="flex items-center gap-2 mb-2">
-                        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${e.type.bg} ${e.type.text}">${e.type.label}</span>
-                        ${costHtml}
-                    </div>
-                    <h3 class="font-bold text-slate-800 text-[17px] mb-1 group-hover:text-sky-600 transition-colors">${e.title}</h3>
-                    <p class="text-slate-500 text-sm leading-relaxed">${e.desc}</p>
-                    ${imgHtml}
-                    <div class="flex justify-end">${igBtnHtml}</div>
-                </div>
-            `;
-            return item;
-        }
-
-        function createListCard(e, index) {
-            const item = document.createElement('div');
-            item.className = "bg-white rounded-xl p-3 shadow-sm border border-sky-50/50 hover:border-sky-200 transition-all cursor-pointer flex flex-col opacity-0 animate-slide-up h-full relative";
-            item.style.animationDelay = `${index * 30}ms`;
-            item.onclick = () => window.open(e.mapUrl, '_blank');
-
-            let imgHtml = e.image ? `<div class="mt-2 rounded-lg overflow-hidden h-24 w-full"><img src="${e.image}" class="w-full h-full object-cover"></div>` : '';
-            let costHtml = e.cost > 0 ? `<div class="mt-2 text-right"><span class="text-[10px] bg-gray-50 text-gray-600 px-1.5 py-0.5 rounded">💰$${e.cost.toLocaleString()}</span></div>` : '';
-            
-            let igBtnHtml = "";
-            if (e.igUrl) {
-                igBtnHtml = `
-                    <button onclick="event.stopPropagation(); window.open('${e.igUrl}', '_blank')" class="absolute top-2 right-2 btn-instagram p-1.5 rounded-full shadow-md z-10 transform scale-75 hover:scale-90 transition-transform">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-                    </button>`;
-            }
-
-            item.innerHTML = `
-                ${igBtnHtml}
-                <div class="flex justify-between items-start mb-1">
-                    <span class="text-2xl">${e.icon}</span>
-                </div>
-                <h3 class="font-bold text-slate-800 text-sm leading-snug group-hover:text-sky-600 line-clamp-2">${e.title}</h3>
-                ${e.desc ? `<p class="text-gray-400 text-xs mt-1 line-clamp-1">${e.desc}</p>` : ''}
-                ${imgHtml}
-                ${costHtml}
-            `;
-            return item;
         }
 
         function getType(t) {
@@ -365,7 +411,7 @@
             if(t.includes('trans')) return {bg:'bg-blue-50', text:'text-blue-600', label:'交通'};
             if(t.includes('food')) return {bg:'bg-orange-50', text:'text-orange-600', label:'美食'};
             if(t.includes('stay')) return {bg:'bg-indigo-50', text:'text-indigo-600', label:'住宿'};
-            return {bg:'bg-cyan-50', text:'text-cyan-600', label:'活動'};
+            return {bg:'bg-emerald-50', text:'text-emerald-600', label:'活動'};
         }
 
         function startCountdown(dateString) {
@@ -373,12 +419,22 @@
             setInterval(() => {
                 const now = new Date().getTime();
                 const distance = targetDate - now;
-                if (distance < 0) { document.getElementById("countdown-timer").innerText = "Have Fun!"; return; }
+                if (distance < 0) { document.getElementById("countdown-timer").innerText = "Trip Started!"; return; }
                 const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                document.getElementById("countdown-timer").innerText = `距離出發 ${days} 天 ${hours} 小時`;
+                document.getElementById("countdown-timer").innerText = `${days} Days to go`;
             }, 1000);
         }
+
+        // 音樂
+        const bgmBtn = document.getElementById('bgm-toggle');
+        const bgmAudio = document.getElementById('bgm-audio');
+        const bgmIcon = document.getElementById('bgm-icon');
+        let isPlaying = false;
+        bgmBtn.addEventListener('click', () => {
+            if (isPlaying) { bgmAudio.pause(); bgmIcon.innerText = "🎵"; } 
+            else { bgmAudio.volume = 0.5; bgmAudio.play().catch(e => alert("Click page first")); bgmIcon.innerText = "⏸"; }
+            isPlaying = !isPlaying;
+        });
     </script>
 </body>
 </html>

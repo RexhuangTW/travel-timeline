@@ -27,7 +27,6 @@
                         'float': 'float 6s ease-in-out infinite',
                         'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
                         'wiggle': 'wiggle 3s ease-in-out infinite',
-                        'spin-slow': 'spin 8s linear infinite',
                     },
                     keyframes: {
                         float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } },
@@ -53,21 +52,49 @@
         .polaroid-card:nth-child(even):hover { transform: rotate(0deg) scale(1.02) translateY(-5px); }
 
         .sticker { position: absolute; z-index: 20; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1)); }
+        
+        /* 地圖容器 */
+        #map-container { 
+            border: 8px solid white; 
+            border-radius: 2rem; 
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); 
+            overflow: hidden; 
+            transform: rotate(1deg); 
+            transition: all 0.5s;
+        }
+        #map-container:hover {
+            transform: rotate(0deg) scale(1.01);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+        }
 
-        /* 地圖容器樣式 */
-        #map-container {
-            border: 8px solid white;
-            border-radius: 2rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            transform: rotate(1deg);
-        }
-        /* 自訂地圖標記 */
-        .custom-pin {
-            background: none; border: none;
-            font-size: 24px; text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        /* 自訂地圖標記 (Pin) 的動畫 */
+        .custom-pin { background: none; border: none; }
+        .pin-inner {
+            font-size: 28px; 
+            text-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            display: block;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             animation: float 2s ease-in-out infinite;
+            cursor: pointer;
         }
+        /* Hover 時放大並停止浮動 */
+        .custom-pin:hover .pin-inner {
+            animation-play-state: paused;
+            transform: scale(1.4) translateY(-10px);
+        }
+
+        /* 地圖 Tooltip 美化 */
+        .leaflet-tooltip-warm {
+            background-color: rgba(255, 255, 255, 0.95);
+            border: 1px solid #fed7aa;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            font-family: 'Fredoka', sans-serif;
+            color: #7c2d12;
+            font-weight: bold;
+            padding: 4px 8px;
+        }
+        .leaflet-tooltip-top:before { border-top-color: #fed7aa; }
     </style>
 </head>
 <body class="min-h-screen relative text-stone-700 selection:bg-orange-200 selection:text-orange-900">
@@ -90,7 +117,10 @@
             <h1 class="font-display text-5xl md:text-6xl font-bold text-stone-800 mb-4 tracking-tight">
                 <span class="text-sky-500">Rex</span>, <span class="text-rose-400">Abby</span> & <span class="text-amber-400">Phoebe</span>
             </h1>
-            <p class="text-xl text-stone-500 font-hand">大手牽小手，一起去郊遊 🎈</p>
+            
+            <p class="text-2xl text-stone-500 font-hand h-8">
+                <span id="typing-text"></span><span class="animate-pulse text-orange-400">|</span>
+            </p>
 
             <div class="mt-10 max-w-3xl mx-auto bg-white/70 backdrop-blur-md rounded-3xl p-6 shadow-sm border border-white grid grid-cols-1 md:grid-cols-3 gap-6 relative">
                 <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-32 h-6 bg-yellow-100/80 rotate-1 shadow-sm transform skew-x-12"></div>
@@ -102,11 +132,13 @@
                         <div><span class="block text-2xl font-bold text-stone-700">5</span><span class="text-xs text-stone-400">Cities</span></div>
                     </div>
                 </div>
+                
                 <div class="flex flex-col justify-center items-center border-r border-stone-100 last:border-0 md:border-b-0 border-b pb-4 md:pb-0">
                     <div class="text-sm font-bold text-stone-400 font-display mb-1">NEXT STOP</div>
                     <div class="text-lg font-bold text-sky-600 flex items-center gap-1">❄️ Sapporo</div>
                     <div id="hero-countdown" class="text-stone-500 text-sm font-hand mt-1 bg-stone-100 px-3 py-1 rounded-full">Loading...</div>
                 </div>
+                
                 <div class="flex flex-col justify-center items-center relative">
                     <div class="text-sm font-bold text-stone-400 font-display mb-1">CURRENTLY</div>
                     <div id="weather-loading" class="absolute inset-0 flex items-center justify-center bg-white/80 z-10"><div class="animate-spin w-5 h-5 border-2 border-stone-200 border-t-stone-400 rounded-full"></div></div>
@@ -119,15 +151,15 @@
         </header>
 
         <section class="max-w-4xl mx-auto mb-16 animate-fade-in-up" style="animation-delay: 0.2s;">
-            <div class="relative">
-                <span class="sticker -top-6 -left-4 text-4xl transform -rotate-12">📍</span>
-                <span class="sticker -bottom-4 -right-4 text-3xl transform rotate-12">🌏</span>
+            <div class="relative group/map">
+                <span class="sticker -top-6 -left-4 text-4xl transform -rotate-12 group-hover/map:scale-110 transition-transform">📍</span>
+                <span class="sticker -bottom-4 -right-4 text-3xl transform rotate-12 group-hover/map:scale-110 transition-transform">🌏</span>
                 
-                <div id="map-container" class="h-[300px] w-full z-0 bg-blue-50"></div>
+                <div id="map-container" class="h-[350px] w-full z-0 bg-blue-50 cursor-pointer" title="點擊空白處還原視野"></div>
                 
                 <div class="absolute bottom-4 left-4 bg-white/90 backdrop-blur px-4 py-2 rounded-xl shadow-md z-[400] pointer-events-none">
-                    <p class="text-xs font-bold text-stone-400 uppercase tracking-widest">Our Footprints</p>
-                    <p class="text-stone-700 font-hand text-lg">凡走過必留下痕跡</p>
+                    <p class="text-xs font-bold text-stone-400 uppercase tracking-widest">Interactive Map</p>
+                    <p class="text-stone-700 font-hand text-lg">點擊圖示飛往城市 ✈️</p>
                 </div>
             </div>
         </section>
@@ -206,7 +238,21 @@
     </div>
 
     <script>
-        // 1. 天氣
+        // 打字機
+        const textElement = document.getElementById('typing-text');
+        const phrases = ["一起看世界 🌍", "收集美好回憶 📸", "品嚐各地美食 🍜", "大手牽小手 👨‍👩‍👧", "滑雪初體驗 🏂"];
+        let phraseIndex = 0; let charIndex = 0; let isDeleting = false; let typeSpeed = 100;
+        function type() {
+            const currentPhrase = phrases[phraseIndex];
+            if (isDeleting) { textElement.textContent = currentPhrase.substring(0, charIndex - 1); charIndex--; typeSpeed = 50; } 
+            else { textElement.textContent = currentPhrase.substring(0, charIndex + 1); charIndex++; typeSpeed = 150; }
+            if (!isDeleting && charIndex === currentPhrase.length) { isDeleting = true; typeSpeed = 2000; } 
+            else if (isDeleting && charIndex === 0) { isDeleting = false; phraseIndex = (phraseIndex + 1) % phrases.length; typeSpeed = 500; }
+            setTimeout(type, typeSpeed);
+        }
+        document.addEventListener('DOMContentLoaded', type);
+
+        // 天氣 (Sapporo)
         function initRootWeather() {
             const apiUrl = "https://api.open-meteo.com/v1/forecast?latitude=43.06&longitude=141.35&current=temperature_2m,weather_code&timezone=Asia%2FTokyo";
             fetch(apiUrl).then(res => res.json()).then(data => {
@@ -222,7 +268,7 @@
         }
         initRootWeather();
 
-        // 2. 倒數
+        // 倒數 (2026/01/24)
         const targetDate = new Date("2026/01/24 00:00:00").getTime();
         setInterval(() => {
             const now = new Date().getTime();
@@ -234,52 +280,62 @@
             }
         }, 1000);
 
-        // 3. 足跡地圖 (Leaflet)
-        // 使用 CartoDB 的淺色地圖圖層，比較溫馨
+        // --- 互動地圖設定 ---
+        const initialView = { lat: 38, lng: 138, zoom: 4 }; // 預設日本全覽
         const map = L.map('map-container', { 
-            zoomControl: false, 
-            scrollWheelZoom: false,
-            dragging: false, // 固定地圖不讓拉動，當作裝飾
-            attributionControl: false
-        }).setView([38, 138], 4); // 聚焦日本
+            zoomControl: false, scrollWheelZoom: false, dragging: true, attributionControl: false 
+        }).setView([initialView.lat, initialView.lng], initialView.zoom);
 
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-            maxZoom: 19
-        }).addTo(map);
+        // 使用淺色底圖 (CartoDB Voyager)
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { maxZoom: 10 }).addTo(map);
 
-        // 自訂圖標
+        // 自訂圖標產生器
         const createIcon = (emoji) => L.divIcon({
             className: 'custom-pin',
-            html: `<div style="font-size:24px;">${emoji}</div>`,
-            iconSize: [30, 30],
-            iconAnchor: [15, 30]
+            html: `<span class="pin-inner">${emoji}</span>`,
+            iconSize: [30, 30], iconAnchor: [15, 30]
         });
 
-        // 標記地點：台北、福岡、札幌
-        L.marker([25.03, 121.56], {icon: createIcon('🏠')}).addTo(map); // 台北
-        L.marker([33.59, 130.40], {icon: createIcon('🍜')}).addTo(map); // 福岡
-        L.marker([43.06, 141.35], {icon: createIcon('❄️')}).addTo(map); // 札幌
+        // 標記點資料
+        const locations = [
+            { name: "Taipei (Home)", lat: 25.03, lng: 121.56, icon: "🏠" },
+            { name: "Fukuoka", lat: 33.59, lng: 130.40, icon: "🍜" },
+            { name: "Sapporo", lat: 43.06, lng: 141.35, icon: "❄️" }
+        ];
 
-        // 4. 背景音樂控制
+        // 新增標記與互動
+        locations.forEach(loc => {
+            const marker = L.marker([loc.lat, loc.lng], {icon: createIcon(loc.icon)}).addTo(map);
+            
+            // 綁定 Tooltip (樣式在 CSS)
+            marker.bindTooltip(loc.name, {
+                permanent: false, 
+                direction: 'top', 
+                className: 'leaflet-tooltip-warm',
+                offset: [0, -10]
+            });
+
+            // 點擊飛到該地點並放大
+            marker.on('click', (e) => {
+                map.flyTo([loc.lat, loc.lng], 9, { duration: 1.5 });
+                L.DomEvent.stopPropagation(e); // 防止觸發地圖背景點擊
+            });
+        });
+
+        // 點擊地圖空白處，復原視野
+        map.on('click', () => {
+            map.flyTo([initialView.lat, initialView.lng], initialView.zoom, { duration: 1.5 });
+        });
+
+        // 音樂
         const bgmBtn = document.getElementById('bgm-toggle');
         const bgmAudio = document.getElementById('bgm-audio');
         const bgmIcon = document.getElementById('bgm-icon');
         const bgmWave = document.getElementById('bgm-wave');
         let isPlaying = false;
-
         bgmBtn.addEventListener('click', () => {
-            if (isPlaying) {
-                bgmAudio.pause();
-                bgmIcon.innerText = "🎵";
-                bgmWave.classList.remove('animate-ping');
-                bgmWave.style.opacity = '0';
-            } else {
-                bgmAudio.volume = 0.5; // 音量小一點比較不吵
-                bgmAudio.play().catch(e => alert("請先與頁面互動才能播放音樂"));
-                bgmIcon.innerText = "⏸";
-                bgmWave.style.opacity = '1';
-                bgmWave.classList.add('animate-ping');
-            }
+            if (isPlaying) { bgmAudio.pause(); bgmIcon.innerText = "🎵"; bgmWave.classList.remove('animate-ping'); bgmWave.style.opacity = '0'; } 
+            else { bgmAudio.volume = 0.5; bgmAudio.play().catch(e => alert("請點擊頁面")); bgmIcon.innerText = "⏸"; bgmWave.style.opacity = '1'; bgmWave.classList.add('animate-ping'); }
             isPlaying = !isPlaying;
         });
     </script>
