@@ -19,9 +19,7 @@
                         hand: ['"Patrick Hand"', 'cursive'],
                     },
                     colors: {
-                        warm: { 50: '#fff7ed', 100: '#ffedd5', 200: '#fed7aa', 500: '#f97316' },
-                        // 福岡主題色：暖橘紅
-                        fukuoka: { 100: '#ffmVYe', 500: '#ea580c', 600: '#c2410c' } 
+                        warm: { 50: '#fff7ed', 100: '#ffedd5', 200: '#fed7aa', 500: '#f97316' }
                     },
                     animation: {
                         'float': 'float 6s ease-in-out infinite',
@@ -39,28 +37,21 @@
     </script>
 
     <style>
-        body { background-color: #fffbf0; overflow-x: hidden; } /* 奶油底色 */
-        
-        /* 背景光暈 (暖色系呼應福岡美食) */
+        body { background-color: #fffbf0; overflow-x: hidden; }
         .warm-blob { position: absolute; filter: blur(60px); z-index: 0; opacity: 0.4; animation: float 10s ease-in-out infinite; }
         
-        /* 拍立得卡片 (清單模式) */
         .polaroid-card {
             background: white; padding: 10px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
-            border: 1px solid #f3f4f6;
-            transition: all 0.3s; 
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            border: 1px solid #f3f4f6; transition: all 0.3s;
         }
         .polaroid-card:hover { transform: scale(1.02) rotate(1deg); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 10; }
 
-        /* 行程卡片 (時間軸模式) */
         .journal-card {
             background: white; border-radius: 1rem;
             box-shadow: 2px 4px 12px rgba(0,0,0,0.03);
-            border: 1px solid rgba(255,255,255,0.8);
-            position: relative;
+            border: 1px solid rgba(255,255,255,0.8); position: relative;
         }
-        /* 紙膠帶裝飾 (橘色) */
         .washi-tape {
             position: absolute; top: -10px; left: 50%; transform: translateX(-50%) rotate(-2deg);
             width: 80px; height: 20px; background-color: rgba(251, 146, 60, 0.3);
@@ -69,10 +60,9 @@
 
         .sticker { position: absolute; z-index: 20; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1)); }
         
-        /* 底部導航 */
         .nav-bar {
             position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px);
             border-radius: 2rem; padding: 0.4rem; display: flex; gap: 0.5rem;
             z-index: 100; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
             border: 1px solid rgba(255,255,255,0.5);
@@ -83,13 +73,11 @@
         }
         .nav-btn.active { background: #ea580c; color: white; box-shadow: 0 4px 10px rgba(234, 88, 12, 0.3); transform: translateY(-2px); }
 
-        /* IG 按鈕 */
         .btn-instagram {
             background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
             color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.15);
         }
         
-        /* 時間軸虛線 */
         .timeline-line { 
             position: absolute; left: 24px; top: 20px; bottom: 0; width: 2px; 
             background: repeating-linear-gradient(to bottom, #fdba74 0, #fdba74 5px, transparent 5px, transparent 10px); 
@@ -105,7 +93,6 @@
     </div>
 
     <div class="relative z-10 max-w-lg mx-auto px-6 py-8">
-        
         <a href="../" class="absolute top-6 left-6 w-10 h-10 bg-white/60 backdrop-blur rounded-full flex items-center justify-center shadow-sm text-stone-500 hover:scale-110 transition-transform z-50">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
         </a>
@@ -116,10 +103,7 @@
                 <span class="text-xs font-bold text-orange-700 tracking-widest font-display">FUKUOKA 2025</span>
             </div>
             <h1 class="text-4xl font-display font-bold text-stone-800 mb-2 tracking-tight">福岡<br><span class="text-orange-500 font-hand text-5xl">採買放風之旅</span></h1>
-            
-            <div id="countdown-timer" class="text-stone-400 text-sm font-hand mt-2 bg-white/50 inline-block px-3 py-1 rounded-lg backdrop-blur-sm border border-white">
-                計算中...
-            </div>
+            <div id="countdown-timer" class="text-stone-400 text-sm font-hand mt-2 bg-white/50 inline-block px-3 py-1 rounded-lg backdrop-blur-sm border border-white">計算中...</div>
         </div>
 
         <div class="grid grid-cols-2 gap-4 mb-8">
@@ -134,8 +118,7 @@
             
             <div class="bg-white/70 backdrop-blur rounded-2xl p-4 shadow-sm border border-white relative transform rotate-1 flex flex-col items-center justify-center">
                 <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-16 h-4 bg-yellow-200/50 -rotate-2"></div>
-                <div id="weather-loading" class="animate-spin w-5 h-5 border-2 border-stone-200 border-t-orange-400 rounded-full"></div>
-                <div id="weather-display" class="flex flex-col items-center opacity-0 transition-opacity duration-500">
+                <div id="weather-display" class="flex flex-col items-center transition-opacity duration-500">
                     <span id="weather-icon" class="text-3xl mb-1 animate-float">☀️</span>
                     <div class="flex items-baseline gap-1">
                         <span id="weather-temp" class="text-2xl font-bold text-stone-700 font-display">--</span>
@@ -147,7 +130,6 @@
     </div>
 
     <div class="max-w-xl mx-auto px-4 relative z-20">
-        
         <div id="sticky-header" class="sticky top-4 z-30 mb-6 transition-all duration-300">
             <div class="bg-white/80 backdrop-blur-md shadow-sm rounded-full p-1.5 border border-white/50">
                 <div class="flex overflow-x-auto hide-scrollbar gap-1.5" id="day-tabs"></div>
@@ -157,7 +139,6 @@
 
         <div class="relative min-h-[400px]">
             <div id="timeline-line" class="timeline-line transition-opacity duration-300"></div>
-            
             <div id="schedule-list" class="space-y-6 relative z-10 pb-10">
                  <div class="flex flex-col items-center justify-center py-20 text-stone-400 font-hand text-xl">
                     <span class="animate-bounce mb-2">🍜</span>
@@ -172,40 +153,25 @@
         <button onclick="switchMode('list')" id="btn-list" class="nav-btn">📝 清單</button>
     </div>
 
-    <div class="fixed bottom-6 right-6 z-50">
-        <button id="bgm-toggle" class="w-12 h-12 bg-white/80 backdrop-blur rounded-full shadow-md border border-white flex items-center justify-center text-xl transition-all hover:scale-110 group">
-            <span id="bgm-icon">🎵</span>
-        </button>
-        <audio id="bgm-audio" loop>
-            <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112191.mp3" type="audio/mpeg">
-        </audio>
-    </div>
-
     <script>
         const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT0VzpYNtRMmLw1A39zZtqT4mRAyUpZynYsd_CxtmqYWzC7kXjs-S6Kam7cEPkU3wcK6SlFO1yYwx-O/pub?gid=0&single=true&output=csv';
 
         let currentMode = 'schedule';
         let currentDayIndex = 0;
-        let rawData = [], scheduleData = [], listData = new Map();
+        let scheduleData = [], listData = new Map();
 
         window.onload = function() { fetchData(); initWeather(); };
 
-        // 天氣 (福岡)
         function initWeather() {
-            const apiUrl = "https://api.open-meteo.com/v1/forecast?latitude=33.59&longitude=130.40&current=temperature_2m,weather_code&timezone=Asia%2FTokyo";
-            fetch(apiUrl).then(res => res.json()).then(data => {
+            fetch("https://api.open-meteo.com/v1/forecast?latitude=33.59&longitude=130.40&current=temperature_2m,weather_code&timezone=Asia%2FTokyo")
+            .then(res => res.json()).then(data => {
                 const temp = Math.round(data.current.temperature_2m);
                 const code = data.current.weather_code;
                 let icon = "☁️";
-                if (code === 0) icon = "☀️"; 
-                else if (code >= 1 && code <= 3) icon = "⛅"; 
-                else if (code >= 51) icon = "🌧️";
-                
+                if (code === 0) icon = "☀️"; else if (code >= 1 && code <= 3) icon = "⛅"; else if (code >= 51) icon = "🌧️";
                 document.getElementById('weather-temp').innerText = temp;
                 document.getElementById('weather-icon').innerText = icon;
-                document.getElementById('weather-loading').style.display = 'none';
-                document.getElementById('weather-display').classList.remove('opacity-0');
-            }).catch(console.error);
+            }).catch(e => console.log(e));
         }
 
         function fetchData() {
@@ -216,19 +182,15 @@
         }
 
         function processData(data) {
-            rawData = data.filter(row => row.day_group);
-            if (!rawData.length) return;
-
+            const raw = data.filter(row => row.day_group);
             let grandTotal = 0;
             const scheduleMap = new Map();
 
-            rawData.forEach(row => {
+            raw.forEach(row => {
                 let cost = parseInt((row.cost||"").replace(/[^0-9]/g, '')) || 0; 
                 grandTotal += cost;
                 
                 let mapUrl = row.map_url || (row.title ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(row.title)}` : "");
-                
-                // IG 連結自動產生
                 let igUrl = row.instagram || "";
                 if (!igUrl && row.title && !(row.type||"").toLowerCase().includes('transport')) {
                     const cleanTitle = row.title.replace(/[ .\/\\()（）-]/g, '');
@@ -245,7 +207,6 @@
                     const dayKey = row.day_group.trim();
                     if (!scheduleMap.has(dayKey)) scheduleMap.set(dayKey, { day: row.day_group, date: row.date, events: [] });
                     scheduleMap.get(dayKey).events.push(item);
-                    // 倒數 2025/11/28
                     if (scheduleMap.size === 1) startCountdown(`2025/${row.date.split(' ')[0]} 00:00:00`);
                 } else {
                     const listKey = row.day_group.trim();
@@ -256,37 +217,46 @@
 
             scheduleData = Array.from(scheduleMap.values());
             document.getElementById('total-budget').innerText = grandTotal.toLocaleString();
-            renderScheduleMode();
+            
+            // 判斷顯示模式
+            if (scheduleData.length > 0) {
+                renderScheduleMode();
+            } else if (listData.size > 0) {
+                switchMode('list');
+            } else {
+                document.getElementById('schedule-list').innerHTML = `<div class="text-center py-10 text-stone-400 font-hand">Empty List</div>`;
+            }
         }
 
         function switchMode(mode) {
             currentMode = mode;
-            document.getElementById('btn-schedule').className = `nav-btn ${mode === 'schedule' ? 'active' : ''}`;
-            document.getElementById('btn-list').className = `nav-btn ${mode === 'list' ? 'active' : ''}`;
-            
-            const dayTabs = document.getElementById('day-tabs');
-            const catTabs = document.getElementById('category-tabs');
+            const btnSchedule = document.getElementById('btn-schedule');
+            const btnList = document.getElementById('btn-list');
+            const activeClass = "bg-orange-500 text-white shadow-md transform -translate-y-0.5";
+            const inactiveClass = "text-stone-400 hover:bg-white hover:text-stone-600";
 
             if (mode === 'schedule') {
+                btnSchedule.className = `nav-btn ${activeClass}`;
+                btnList.className = `nav-btn ${inactiveClass}`;
                 document.getElementById('timeline-line').style.opacity = '1';
-                dayTabs.classList.remove('hidden');
-                catTabs.classList.add('hidden');
+                document.getElementById('day-tabs').classList.remove('hidden');
+                document.getElementById('category-tabs').classList.add('hidden');
                 renderScheduleMode();
             } else {
+                btnList.className = `nav-btn ${activeClass}`;
+                btnSchedule.className = `nav-btn ${inactiveClass}`;
                 document.getElementById('timeline-line').style.opacity = '0';
-                dayTabs.classList.add('hidden');
-                catTabs.classList.remove('hidden');
+                document.getElementById('day-tabs').classList.add('hidden');
+                document.getElementById('category-tabs').classList.remove('hidden');
                 renderListMode();
             }
         }
 
-        // 行程模式 (Journal Style)
         function renderScheduleMode() {
             renderTabs();
             const container = document.getElementById('schedule-list');
             container.innerHTML = '';
-            container.className = "space-y-8 pb-24"; 
-
+            
             if(scheduleData.length > 0) {
                 scheduleData[currentDayIndex].events.forEach((e, i) => {
                     const item = document.createElement('div');
@@ -304,10 +274,8 @@
                                 <div class="w-10 h-10 rounded-full bg-white border-2 border-dashed border-stone-200 shadow-sm flex items-center justify-center text-lg z-10 group-hover:rotate-12 transition-transform">${e.icon}</div>
                             </div>
                         </div>
-                        
                         <div class="flex-1 journal-card p-4 hover:shadow-md transition-all cursor-pointer" onclick="window.open('${e.mapUrl}', '_blank')">
                             <div class="washi-tape"></div>
-                            
                             <div class="flex justify-between items-start mb-1">
                                 <span class="px-2 py-0.5 rounded text-[10px] font-bold ${e.type.bg} ${e.type.text}">${e.type.label}</span>
                                 ${costHtml}
@@ -321,21 +289,18 @@
                     container.appendChild(item);
                 });
             } else {
-                container.innerHTML = `<div class="text-center py-10 text-stone-400 font-hand">Empty Page...</div>`;
+                container.innerHTML = `<div class="text-center py-10 text-stone-400 font-hand">No Schedule</div>`;
             }
         }
 
-        // 清單模式 (Masonry Polaroid Style)
         function renderListMode() {
             const container = document.getElementById('schedule-list');
             const catContainer = document.getElementById('category-tabs');
             container.innerHTML = '';
             catContainer.innerHTML = ''; 
-            container.className = "pb-24"; 
 
             if (listData.size === 0) return;
 
-            // 分類按鈕
             listData.forEach((_, category) => {
                 const btn = document.createElement('button');
                 btn.className = "flex-none px-4 py-1.5 rounded-full text-sm font-hand font-bold bg-white text-stone-500 border border-stone-200 hover:bg-orange-50 hover:text-orange-600 transition-all";
@@ -350,7 +315,6 @@
                 catContainer.appendChild(btn);
             });
 
-            // 內容
             listData.forEach((items, category) => {
                 const section = document.createElement('div');
                 section.id = `cat-${category}`;
@@ -362,7 +326,7 @@
 
                 section.innerHTML = `
                     <div class="flex items-center gap-2 mb-4 px-1 sticky top-16 z-0 pt-2 pb-1 bg-[#fffbf0]/90 backdrop-blur-sm w-full">
-                        <span class="px-3 py-1 rounded-md text-xs font-bold font-display ${badgeClass}">${category}</span>
+                        <span class="px-3 py-1 rounded-lg text-xs font-bold ${badgeClass}">${category}</span>
                         <span class="text-xs text-stone-400 font-mono">(${items.length})</span>
                     </div>
                     <div class="grid grid-cols-2 gap-4"></div>
@@ -426,16 +390,6 @@
                 document.getElementById("countdown-timer").innerText = `倒數 ${days} 天`;
             }, 1000);
         }
-
-        const bgmBtn = document.getElementById('bgm-toggle');
-        const bgmAudio = document.getElementById('bgm-audio');
-        const bgmIcon = document.getElementById('bgm-icon');
-        let isPlaying = false;
-        bgmBtn.addEventListener('click', () => {
-            if (isPlaying) { bgmAudio.pause(); bgmIcon.innerText = "🎵"; } 
-            else { bgmAudio.volume = 0.5; bgmAudio.play().catch(e => alert("Click page first")); bgmIcon.innerText = "⏸"; }
-            isPlaying = !isPlaying;
-        });
     </script>
 </body>
 </html>
